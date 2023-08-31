@@ -1,0 +1,140 @@
+<section class="flex-column" style="height: 100%; overflow: hidden; flex: 1 1 0%;" (document:keydown.escape)="cancelarAccion()"> <!-- Main Body <<<<<<< -->
+    <section class="dialog-toolbar"> <!-- Toolbar Menu <<<<<<< -->
+        <div class="flex-row">
+            <div class="label-info" *ngIf="!statusUser">
+                Nuevo Ticket de Servicio
+            </div>
+            <button mat-button [matMenuTriggerFor]="menuUsuario" aria-label="Menu de Usuarios" [disabled]="isLoading || isSaving"  *ngIf="statusUser">
+                <mat-icon>settings</mat-icon><span class="hide-xs">Opciones&nbsp;</span><mat-icon>arrow_drop_down</mat-icon>
+            </button>
+            <mat-menu #menuUsuario="matMenu">
+                <button mat-menu-item  *ngIf="ticket.id" >
+                    <mat-icon>outgoing_mail</mat-icon> 
+                    <span>Cambio de Contraseña</span>
+                </button>
+                <mat-divider></mat-divider>
+            </mat-menu>
+            <button mat-button (click)="guardarTicket()" [disabled]="isLoading || isSaving || !formTicket.valid || !formSegumientoCheck.valid">
+                <mat-icon>{{'save'}}</mat-icon><span class="hide-xs">&nbsp;Guardar</span>
+            </button>
+            <div class="flex-fill"></div>
+            <div *ngIf="isRoot" class="root-access">
+                &LeftAngleBracket;&LeftAngleBracket; root &RightAngleBracket;&RightAngleBracket;
+            </div>
+            <div class="label-info screen-size-icon" *ngIf="currentScreenSize == 'xs' || currentScreenSize == 'sm'">
+                <mat-icon>phone_iphone</mat-icon>
+            </div>
+            <button mat-button class="boton-accion" (click)="resizeDialog()" [matTooltip]="(dialogMaxSize)?'Restaurar':'Maximizar'" [matTooltipPosition]="'left'" tabindex="-1" *ngIf="currentScreenSize != 'xs' && currentScreenSize != 'sm'">
+                <mat-icon>{{(dialogMaxSize)?'fit_screen':'fullscreen'}}</mat-icon>
+            </button>
+            <button class="boton-accion boton-cerrar" mat-button (click)="cerrar()" tabindex="-1"><mat-icon>close</mat-icon></button>
+        </div>
+    </section> <!-- <<<<<<< Toolbar Menu -->
+    <mat-progress-bar *ngIf="isLoading || isSaving" [mode]="(isSaving)?'indeterminate':'query'" [color]="(isSaving )?'accent':'primary'"></mat-progress-bar>
+    <section>
+        <alert-panel></alert-panel>
+    </section>
+
+    <section class="flex-fill flex-column" style="padding:8px; overflow: auto;">
+        <div class="flex-fill flex-column flex-gap">
+
+            <mat-tab-group [color]="'primary'" animationDuration="0ms" class="flex-fill full-height-tabs ticket-tabs">
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <mat-icon>contact_emergency</mat-icon><span class="hide-xs">&nbsp;Ticket (Solicitud)</span>
+                    </ng-template>
+                    
+                        <mat-card class="flex-column flex-gap xs-max-height-ticket-form" style="padding: 8px;" [formGroup]="formTicket">
+                            <div class="flex-row flex-xs-column flex-fill flex-gap">
+
+                                <mat-form-field appearance="fill" class="flex-fill">
+                                    <mat-label>Fecha: </mat-label>
+                                    <input matInput [min]="minDate" [max]="maxDate" [matDatepicker]="picker_ticket" autocomplete="off" formControlName="fecha_ticket" placeholder="Fecha" readonly>
+                                    <mat-datepicker-toggle matSuffix [for]="picker_ticket"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker_ticket></mat-datepicker>
+                                </mat-form-field>
+                                
+                            </div>
+
+                            <div class="flex-row flex-xs-column flex-fill flex-gap">
+
+                                <mat-form-field appearance="fill" class="flex-fill" *ngIf="!catalogos['clues']">
+                                    <mat-label>Unidad: </mat-label>
+                                    <input matInput formControlName="clues_id">
+                                    <mat-hint>Escribe el nombre de la Clues</mat-hint>
+                                    <mat-error *ngIf="formTicket.get('clues_id').hasError('required')">Este campo es obligatorio</mat-error>
+                                </mat-form-field>
+
+                                <mat-form-field appearance="fill" class="flex-fill" *ngIf="catalogos['clues']">
+                                    <mat-label>Unidad: </mat-label>
+                                    <input type="text" aria-label="clues" matInput formControlName="clues_id" [matAutocomplete]="unidadAutocomplete" required (blur)="checkAutocompleteValue('clues_id')">
+                                    <mat-autocomplete #unidadAutocomplete="matAutocomplete" [displayWith]="getDisplayFn('nombre_unidad')" (optionSelected)="cargarCrs($event)">
+                                        <mat-option *ngFor="let item of filteredCatalogs['clues'] | async" [value]="item">
+                                            ({{item.clues}}) - {{item.nombre_unidad}}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                    <mat-hint *ngIf="!formTicket.get('clues_id').value">Selecciona una Clues de la lista</mat-hint>
+                                    <mat-hint [style.text-align]="'start'" *ngIf="formTicket.get('clues_id').value">Clues: [{{formTicket.get('clues_id').value.clues}}]</mat-hint>
+                                    <mat-error *ngIf="formTicket.get('clues_id').hasError('required')">Este campo es obligatorio</mat-error>
+                                </mat-form-field>
+
+
+                                <mat-form-field appearance="fill" class="flex-fill" *ngIf="!catalogos['cr']">
+                                    <mat-label>Cr (Centro de Responsabilidad): </mat-label>
+                                    <input matInput formControlName="cr_id">
+                                    <mat-hint>Escribe el nombre de la Clues</mat-hint>
+                                    <mat-error *ngIf="formTicket.get('cr_id').hasError('required')">Este campo es obligatorio</mat-error>
+                                </mat-form-field>
+
+                                <mat-form-field appearance="fill" class="flex-fill" *ngIf="catalogos['cr']">
+                                    <mat-label>Cr (Centro de Responsabilidad): </mat-label>
+                                    <input type="text" aria-label="clues" matInput formControlName="cr_id" [matAutocomplete]="crAutocomplete" required (blur)="checkAutocompleteValue('cr_id')">
+                                    <mat-autocomplete #crAutocomplete="matAutocomplete" [displayWith]="getDisplayFn('descripcion')" (optionSelected)="cargarPersonal($event)">
+                                        <mat-option *ngFor="let item of filteredCatalogs['cr'] | async" [value]="item">
+                                            ({{item.cr}}) - {{item.descripcion}}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                    <mat-hint *ngIf="!formTicket.get('cr_id').value">Selecciona un Cr de la lista</mat-hint>
+                                    <mat-hint [style.text-align]="'start'" *ngIf="formTicket.get('cr_id').value">CR: [{{formTicket.get('cr_id').value.cr}}]</mat-hint>
+                                    <mat-error *ngIf="formTicket.get('cr_id').hasError('required')">Este campo es obligatorio</mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <div class="flex-row flex-xs-column flex-fill flex-gap">
+
+                                <mat-form-field appearance="fill" class="flex-fill" *ngIf="!catalogos['personas']">
+                                    <mat-label>Nombre de la Persona: </mat-label>
+                                    <input matInput formControlName="nombre_persona">
+                                    <mat-hint>Escribe el nombre de la Persona</mat-hint>
+                                    <mat-error *ngIf="formTicket.get('nombre_persona').hasError('required')">Este campo es obligatorio</mat-error>
+                                </mat-form-field>
+
+                                <mat-form-field appearance="fill" class="flex-fill" *ngIf="catalogos['personas']">
+                                    <mat-label>Nombre de la Persona: </mat-label>
+                                    <input type="text" aria-label="persona_id" matInput formControlName="persona_id" [matAutocomplete]="crAutocomplete" required >
+                                    <mat-autocomplete #crAutocomplete="matAutocomplete" [displayWith]="getDisplayFn('nombre')">
+                                        <mat-option *ngFor="let item of filteredCatalogs['personas'] | async" [value]="item">
+                                            {{item.nombre}}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                    <mat-hint *ngIf="!formTicket.get('persona_id').value">Selecciona una Persona de la lista</mat-hint>
+                                    <mat-error *ngIf="formTicket.get('persona_id').hasError('required')">Este campo es obligatorio</mat-error>
+                                </mat-form-field>
+
+                            </div>
+
+                        </mat-card>
+
+                </mat-tab>
+
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <mat-icon>local_fire_department</mat-icon><span class="hide-xs">&nbsp;Segumiento (Problema)</span>
+                    </ng-template>
+                        <tab-seguimiento-ticket (onFormGroupSeguimiento)="onFormGroupSeguimientoChangeEvent($event)"></tab-seguimiento-ticket>
+                </mat-tab>
+            </mat-tab-group>
+
+        </div>
+    </section>
+</section>

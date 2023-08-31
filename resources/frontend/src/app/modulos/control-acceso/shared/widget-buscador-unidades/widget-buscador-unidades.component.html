@@ -1,0 +1,45 @@
+<div class="flex-column flex-gap" style="height: calc(100% - 10px); padding: 5px; background-color: white; ">
+    <div class="flex-column flex-gap">
+        <div>
+            <mat-form-field class="flex-fill small-search-input" appearance="outline" autocomplete="off">
+                <input matInput #searchUnidad placeholder="Buscar Unidad" (keyup.enter)="buscarUnidades(searchUnidad)" autocomplete="off">
+                <mat-icon matPrefix>search</mat-icon>
+                <mat-icon matSuffix class="action" *ngIf="searchUnidad.value" (click)="searchUnidad.value = ''">clear</mat-icon>
+            </mat-form-field>
+        </div>
+        <div class="flex-row flex-gap">
+            <button mat-stroked-button class="flex-fill" [matMenuTriggerFor]="menuDistritos" [disabled]="isLoading">
+                {{(distritoSeleccionado)?distritoSeleccionado.descripcion:'Seleccionar Distrito'}} <mat-icon>arrow_drop_down</mat-icon>
+            </button>
+            <mat-menu #menuDistritos="matMenu">
+                <button mat-menu-item *ngIf="listaDistritos.length == 0" disabled>Sin Distritos Cargados</button>
+                <button mat-menu-item *ngIf="listaDistritos.length > 0" (click)="filtrarPorDistrito()">TODOS</button>
+                <button mat-menu-item *ngFor="let distrito of listaDistritos" (click)="filtrarPorDistrito(distrito)">{{distrito.clave}} - {{distrito.descripcion}}</button>
+            </mat-menu>
+            <button mat-flat-button color="primary" (click)="buscarUnidades(searchUnidad)"><mat-icon>search</mat-icon> Buscar</button>
+        </div>
+    </div>
+    <div style="overflow: auto; text-align: center; height: 0;" class="flex-fill lista-resultados">
+        <div class="item-resultado" *ngIf="isLoading">Cargando...</div>
+        <div class="item-resultado" *ngIf="!isLoading && !responseUnidades">---| Buscar Unidades |---</div>
+        <div class="item-resultado" *ngIf="!isLoading && responseUnidades && responseUnidades.length == 0">Sin resultados obtenidos</div>
+        <div class="item-resultado" *ngFor="let unidad of responseUnidades" (click)="seleccionar(unidad)">
+            <div class="encabezado">
+                <div class="clues"><span>CLUES:</span> {{unidad.clues}}</div>
+                <div class="distrito"><span>DISTRITO {{unidad.distrito.clave}}:</span> {{unidad.distrito.descripcion}}</div>
+            </div>
+            <div class="nombre-unidad">
+                {{unidad.descripcion}}
+            </div>
+        </div>
+    </div>
+    <div class="flex-row total-resultados">
+        <div style="padding: 5px;" *ngIf="responseUnidades && responseUnidades.length > 0">
+            <button mat-flat-button color="primary" (click)="seleccionarTodos()"><mat-icon>clear_all</mat-icon> Todos</button>
+        </div>
+        <div class="flex-fill"></div>
+        <div *ngIf="!isLoading && responseUnidades">
+            {{responseUnidades.length | number}} Resultados
+        </div>
+    </div>
+</div>

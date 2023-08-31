@@ -1,0 +1,11 @@
+.mat-mdc-header-cell.mat-column-id, .mat-mdc-header-cell.mat-column-updated_at{
+    text-align: center;
+}
+
+.mat-column-id, .mat-column-updated_at, .mat-column-total_users, .mat-column-total_permissions{
+    width: 1px;
+}
+
+.mat-column-total_users, .mat-column-total_permissions{
+    text-align: center;
+}

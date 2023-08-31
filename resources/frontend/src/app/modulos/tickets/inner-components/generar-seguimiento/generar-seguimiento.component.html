@@ -1,0 +1,153 @@
+<section class="flex-column" style="height: 100%; overflow: hidden; flex: 1 1 0%;" (document:keydown.escape)="cancelarAccion()"> <!-- Main Body <<<<<<< -->
+    <section class="dialog-toolbar"> <!-- Toolbar Menu <<<<<<< -->
+        <div class="flex-row">
+            <div class="label-info" >
+                Generar Seguimiento del Ticket
+            </div>
+            <button mat-button [matMenuTriggerFor]="menuUsuario" aria-label="Menu de Usuarios" [disabled]="isLoading || isSaving">
+                <mat-icon>settings</mat-icon><span class="hide-xs">Opciones&nbsp;</span><mat-icon>arrow_drop_down</mat-icon>
+            </button>
+            <mat-menu #menuUsuario="matMenu">
+                <button mat-menu-item  *ngIf="seguimiento.id">
+                    <mat-icon>outgoing_mail</mat-icon> 
+                    <span>Hacer Algo</span>
+                </button>
+                <mat-divider></mat-divider>
+            </mat-menu>
+            <button mat-button (click)="guardarSeguimiento()" [disabled]="isLoading || isSaving || !formGenerarSeguimiento.valid">
+                <mat-icon>{{'save'}}</mat-icon><span class="hide-xs">&nbsp;Guardar</span>
+            </button>
+            <div class="flex-fill"></div>
+            <div class="label-info screen-size-icon" *ngIf="currentScreenSize == 'xs' || currentScreenSize == 'sm'">
+                <mat-icon>phone_iphone</mat-icon>
+            </div>
+            <button mat-button class="boton-accion" (click)="resizeDialog()" [matTooltip]="(dialogMaxSize)?'Restaurar':'Maximizar'" [matTooltipPosition]="'left'" tabindex="-1" *ngIf="currentScreenSize != 'xs' && currentScreenSize != 'sm'">
+                <mat-icon>{{(dialogMaxSize)?'fit_screen':'fullscreen'}}</mat-icon>
+            </button>
+            <button class="boton-accion boton-cerrar" mat-button (click)="cerrar()" tabindex="-1"><mat-icon>close</mat-icon></button>
+        </div>
+    </section> <!-- <<<<<<< Toolbar Menu -->
+    <mat-progress-bar *ngIf="isLoading || isSaving" [mode]="(isSaving)?'indeterminate':'query'" [color]="(isSaving )?'accent':'primary'"></mat-progress-bar>
+    <section>
+        <alert-panel></alert-panel>
+    </section>
+
+    <section class="flex-fill flex-column" style="padding:8px; overflow: auto;">
+        <div class="flex-fill flex-column flex-gap">
+            <mat-card class="flex-column flex-gap xs-max-height-asignar-ticket-form" style="padding: 8px;" [formGroup]="formGenerarSeguimiento">
+
+                <div class="flex-row flex-xs-column flex-fill flex-gap">
+
+
+                    <mat-form-field appearance="fill" class="flex-fill" *ngIf="!catalogos['status_seguimiento']">
+                        <mat-label>Status del Seguimiento: </mat-label>
+                        <input matInput formControlName="status_seguimiento_id">
+                        <mat-hint>Escribe el Status del Seguimiento</mat-hint>
+                        <mat-error *ngIf="formGenerarSeguimiento.get('status_seguimiento_id').hasError('required')">Este campo es obligatorio</mat-error>
+                    </mat-form-field>
+            
+                    <mat-form-field appearance="fill" class="flex-fill" *ngIf="catalogos['status_seguimiento']">
+                        <mat-label>Status del Seguimiento: </mat-label>
+                        <input type="text" aria-label="status_seguimiento" matInput formControlName="status_seguimiento_id" [matAutocomplete]="estatusSequimientoAutocomplete" required>
+                        <mat-autocomplete #estatusSequimientoAutocomplete="matAutocomplete" [displayWith]="getDisplayFn('descripcion')">
+                            <mat-option *ngFor="let item of filteredCatalogs['status_seguimiento'] | async" [value]="item">
+                                {{item.descripcion}}
+                            </mat-option>
+                        </mat-autocomplete>
+                        <mat-hint *ngIf="!formGenerarSeguimiento.get('status_seguimiento_id').value">Selecciona una el Area de Atención de la lista</mat-hint>
+                        <mat-hint [style.text-align]="'start'" *ngIf="formGenerarSeguimiento.get('status_seguimiento_id').value"></mat-hint>
+                        <mat-error *ngIf="formGenerarSeguimiento.get('status_seguimiento_id').hasError('required')">Este campo es obligatorio</mat-error>
+                    </mat-form-field>
+            
+            
+            
+                    <mat-form-field appearance="fill" class="flex-fill" *ngIf="!catalogos['tipo_equipo']">
+                        <mat-label>Tipo Equipo: </mat-label>
+                        <input matInput formControlName="tipo_equipo_id">
+                        <mat-hint>Escribe el Area Atención</mat-hint>
+                        <mat-error *ngIf="formGenerarSeguimiento.get('tipo_equipo_id').hasError('required')">Este campo es obligatorio</mat-error>
+                    </mat-form-field>
+            
+                    <mat-form-field appearance="fill" class="flex-fill" *ngIf="catalogos['tipo_equipo']">
+                        <mat-label>Tipo Equipo: </mat-label>
+                        <input type="text" aria-label="tipo_equipo" matInput formControlName="tipo_equipo_id" [matAutocomplete]="tipoEquipoAutocomplete" required >
+                        <mat-autocomplete #tipoEquipoAutocomplete="matAutocomplete" [displayWith]="getDisplayFn('descripcion')">
+                            <mat-option *ngFor="let item of filteredCatalogs['tipo_equipo'] | async" [value]="item">
+                                {{item.descripcion}}
+                            </mat-option>
+                        </mat-autocomplete>
+                        <mat-hint *ngIf="!formGenerarSeguimiento.get('tipo_equipo_id').value">¡Selecciona un Tipo de Equipo de la lista!</mat-hint>
+                        <mat-hint [style.text-align]="'start'" *ngIf="formGenerarSeguimiento.get('tipo_equipo_id').value"></mat-hint>
+                        <mat-error *ngIf="formGenerarSeguimiento.get('tipo_equipo_id').hasError('required')">Este campo es obligatorio</mat-error>
+                    </mat-form-field>
+            
+                </div>
+                <div class="flex-row flex-xs-column flex-fill flex-gap">
+            
+                    <mat-form-field appearance="fill" class="flex-fill" *ngIf="!catalogos['areas_atencion']">
+                        <mat-label>Area de Atención: </mat-label>
+                        <input matInput formControlName="area_atencion_id">
+                        <mat-hint>Escribe el Area Atención</mat-hint>
+                        <mat-error *ngIf="formGenerarSeguimiento.get('area_atencion_id').hasError('required')">Este campo es obligatorio</mat-error>
+                    </mat-form-field>
+            
+                    <mat-form-field appearance="fill" class="flex-fill" *ngIf="catalogos['areas_atencion']">
+                        <mat-label>Area de Atención: </mat-label>
+                        <input type="text" aria-label="area_atencion" matInput formControlName="area_atencion_id" [matAutocomplete]="areaAtencionAutocomplete" required (blur)="checkAutocompleteValue('area_atencion_id')">
+                        <mat-autocomplete #areaAtencionAutocomplete="matAutocomplete" [displayWith]="getDisplayFn('descripcion')" (optionSelected)="cargarTiposProblema($event)">
+                            <mat-option *ngFor="let item of filteredCatalogs['areas_atencion'] | async" [value]="item">
+                                {{item.descripcion}}
+                            </mat-option>
+                        </mat-autocomplete>
+                        <mat-hint *ngIf="!formGenerarSeguimiento.get('area_atencion_id').value">Selecciona una el Area de Atención de la lista</mat-hint>
+                        <mat-hint [style.text-align]="'start'" *ngIf="formGenerarSeguimiento.get('area_atencion_id').value"></mat-hint>
+                        <mat-error *ngIf="formGenerarSeguimiento.get('area_atencion_id').hasError('required')">Este campo es obligatorio</mat-error>
+                    </mat-form-field>
+            
+                    <mat-form-field appearance="fill" class="flex-fill" *ngIf="!catalogos['tipos_problema']">
+                        <mat-label>Tipo de Problema: </mat-label>
+                        <input matInput formControlName="tipo_problema_id">
+                        <mat-hint>Escribe el Area Atención</mat-hint>
+                        <mat-error *ngIf="formGenerarSeguimiento.get('tipo_problema_id').hasError('required')">Este campo es obligatorio</mat-error>
+                    </mat-form-field>
+            
+                    <mat-form-field appearance="fill" class="flex-fill" *ngIf="catalogos['tipos_problema']">
+                        <mat-label>Tipo de Problema: </mat-label>
+                        <input type="text" aria-label="tipo_problema" matInput formControlName="tipo_problema_id" [matAutocomplete]="areaAtencionAutocomplete" required >
+                        <mat-autocomplete #areaAtencionAutocomplete="matAutocomplete" [displayWith]="getDisplayFn('descripcion')">
+                            <mat-option *ngFor="let item of filteredCatalogs['tipos_problema'] | async" [value]="item">
+                                {{item.descripcion}}
+                            </mat-option>
+                        </mat-autocomplete>
+                        <mat-hint *ngIf="!formGenerarSeguimiento.get('tipo_problema_id').value">Selecciona un Tipo de Problema de la lista</mat-hint>
+                        <mat-hint [style.text-align]="'start'" *ngIf="formGenerarSeguimiento.get('tipo_problema_id').value"></mat-hint>
+                        <mat-error *ngIf="formGenerarSeguimiento.get('tipo_problema_id').hasError('required')">Este campo es obligatorio</mat-error>
+                    </mat-form-field>
+            
+                </div>
+                <div class="flex-row flex-xs-column flex-fill flex-gap">
+            
+                    
+            
+                    <mat-form-field appearance="fill" class="flex-fill">
+                        <mat-label>Descripción del Problema: </mat-label>
+                        <textarea matInput formControlName="descripcion_problema" placeholder="Descripción del Problema"></textarea>
+                        <mat-hint>Escribe la Descripción del Problema</mat-hint>
+                        <mat-error *ngIf="formGenerarSeguimiento.get('descripcion_problema').hasError('required')">Este campo es obligatorio</mat-error>
+                    </mat-form-field>
+            
+            
+                    <mat-form-field appearance="fill" class="flex-fill">
+                        <mat-label>Observaciones del Problema: </mat-label>
+                        <textarea matInput formControlName="observaciones_problema" placeholder="Observación del Problema"></textarea>
+                        <mat-hint>Escribe las Observaciones del Problema</mat-hint>
+                        <mat-error *ngIf="formGenerarSeguimiento.get('observaciones_problema').hasError('required')">Este campo es obligatorio</mat-error>
+                    </mat-form-field>
+            
+                </div>
+
+            </mat-card>
+        </div>
+    </section>
+
+</section>

@@ -1,0 +1,51 @@
+.permissions-panel{
+    overflow: auto;
+    padding: 5px;
+}
+
+.permissions-panel .mdc-list-item{
+    height: auto !important;
+    min-height: 48px;
+    padding-right: 0px;
+}
+
+.permissions-panel .mdc-list-item:hover{
+    background: rgba(0,0,0,.04);
+}
+
+.permission-group{
+    display: block;
+    font-size: small;
+    color: slategray;
+}
+
+.permission-item:not(:first-child){
+    border-top: 1px solid darkgray;
+}
+
+.permission-item .action-button{
+    padding: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.permission-item .label{
+    display: inline-block;
+    white-space: normal !important;
+    width: fit-content;
+}
+
+.permission-item .label .mat-icon{
+    margin: 0;
+    line-height: normal;
+    height: 20px;
+    width: 20px;
+    font-size: 24px;
+}
+
+.root-access{
+    font-size: smaller !important;
+    text-align: center;
+    font-weight: 600;
+    color: gold !important;
+}

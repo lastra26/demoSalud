@@ -1,0 +1,13 @@
+.mat-mdc-header-cell.mat-column-id, .mat-mdc-header-cell.mat-column-updated_at{
+    text-align: center;
+}
+
+.mat-column-id, .mat-column-updated_at{
+    width: 1px;
+}
+
+.root-access{
+    text-align: center;
+    font-weight: 600;
+    color: darkgoldenrod !important;
+}

@@ -1,0 +1,14 @@
+@media(max-width: 599.98px){
+    .xs-height-50{
+        height: 50%;
+    }
+
+    .xs-max-height-ticket-form{
+        max-height: 50%;
+        overflow: auto;
+    }
+}
+
+.ticket-tabs{
+    background-color: rgb(246, 246, 246);
+}

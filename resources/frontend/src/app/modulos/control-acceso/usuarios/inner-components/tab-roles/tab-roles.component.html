@@ -1,0 +1,35 @@
+<mat-card class="flex-column flex-gap" style="height: 100%;">
+    <div style="padding: 5px;">
+        <mat-form-field appearance="outline" class="small-search-input">
+            <input matInput type="text" placeholder="Roles" autocomplete="off" [formControl]="roleControl" [matAutocomplete]="autoRoles">
+            <mat-icon matPrefix>keyboard</mat-icon>
+            <span matSuffix>&nbsp;({{(filteredRoles | async)?.length|number}})&nbsp;</span>
+            <mat-autocomplete autoActiveFirstOption #autoRoles="matAutocomplete" class="autocomplete-fix" [classList]="'autocomplete-fix'" [displayWith]="displayFn" (optionSelected)="addRoleEvent($event)">
+                <mat-option *ngIf="catalogRoles.length == 0" disabled class="no-results-found">
+                    No se encontraron Roles
+                </mat-option>
+                <mat-option *ngFor="let role of filteredRoles | async" [value]="role"  class="role-item" [disabled]="controlSelRoles[role.id]">
+                    <div class="label">
+                        <span class="role-group" *ngIf="role.nivel">{{role.nivel.descripcion}}</span>
+                        <mat-icon *ngIf="controlSelRoles[role.id]">playlist_add_check</mat-icon>&nbsp;{{role.name}}
+                    </div>
+                </mat-option>
+            </mat-autocomplete>
+        </mat-form-field>
+    </div>
+    <div class="flex-fill roles-panel mat-elevation-z2">
+        <mat-list role="list" dense>
+            <mat-list-item role="listitem" *ngFor="let role of selectedRoles; let i = index" class="role-item">
+                <div class="flex-row">
+                    <div class="flex-fill label">
+                        <span class="role-group" *ngIf="role.nivel">{{role.nivel.descripcion}}</span>
+                        <span><mat-icon>admin_panel_settings</mat-icon>&nbsp;{{role.name}}</span>
+                    </div>
+                    <span class="action-button">
+                        <button mat-icon-button color="warn" (click)="removeRole(i)"><mat-icon>do_not_disturb_on</mat-icon></button>
+                    </span>
+                </div>
+            </mat-list-item>
+        </mat-list>
+    </div>
+</mat-card>

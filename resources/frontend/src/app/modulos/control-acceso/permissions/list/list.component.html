@@ -1,0 +1,68 @@
+<div class="flex-row flex-gap module-search-bar">
+    <mat-form-field class="flex-fill" appearance="fill">
+        <input matInput [(ngModel)]="searchQuery" (keyup.enter)="applyFilter()" placeholder="Buscar" autocomplete="off">
+        <button mat-icon-button flexFill matSuffix (click)="applyFilter()" color="accent" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="'hidePassword'">
+            <mat-icon>search</mat-icon>
+        </button>
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="openDialogForm()" [matTooltip]="'Nuevo Permiso'"><mat-icon>add</mat-icon></button>
+</div>
+
+<alert-panel></alert-panel>
+
+<mat-card class="flex-fill" style="height: 100%;">
+    <div class="flex-column" style="height: 100%;">
+        <div class="main-list-table left-click-open flex-fill">
+            <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
+                <ng-container matColumnDef="id">
+                    <th mat-header-cell *matHeaderCellDef class="hide-xs"> ID </th>
+                    <td mat-cell *matCellDef="let row" class="hide-xs"> {{row.id}} </td>
+                </ng-container>
+        
+                <ng-container matColumnDef="description">
+                    <th mat-header-cell *matHeaderCellDef> Descripción </th>
+                    <td mat-cell *matCellDef="let row"> {{row.description}} <span class="extra-data hide-gt-sm">{{row.group}}</span> </td>
+                </ng-container>
+        
+                <ng-container matColumnDef="group">
+                    <th mat-header-cell *matHeaderCellDef class="hide-xs hide-sm"> Grupo </th>
+                    <td mat-cell *matCellDef="let row" class="hide-xs hide-sm"> {{row.group}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="updated_at">
+                    <th mat-header-cell *matHeaderCellDef >Registro</th>
+                    <td mat-cell *matCellDef="let row" style="white-space: nowrap;">
+                        <span class="extra-data root-access" *ngIf="row.is_super">--root--</span>
+                        <span class="extra-data">{{row.updated_at | date}}</span>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="noResultsFound">
+                    <td mat-footer-cell *matFooterCellDef [attr.colspan]="displayedColumns.length">
+                        <span>No se encontraron registros</span>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="loadingResults">
+                    <td mat-footer-cell *matFooterCellDef [attr.colspan]="displayedColumns.length">
+                        <span>--| Cargando Registros |--</span>
+                        <mat-progress-bar mode="query"></mat-progress-bar>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                <tr mat-row (click)="openDialogForm(row.id)" [cdkContextMenuTriggerFor]="rowMenu" [cdkContextMenuTriggerData]="{id:row.id}" *matRowDef="let row; columns: displayedColumns;"></tr>
+
+                <tr mat-footer-row *matFooterRowDef="['noResultsFound']" class="no-results-found" [ngClass]="{'hide':(!dataSource || dataSource.length > 0 || isLoading)}"></tr>
+                <tr mat-footer-row *matFooterRowDef="['loadingResults']" class="no-results-found" [ngClass]="{'hide':!isLoading}"></tr>
+            </table>
+        </div>
+        <mat-paginator #paginator [pageSize]="pageSize" [pageIndex]="currentPage" [length]="resultsLength" [pageSizeOptions]="[10, 25, 50, 100]" showFirstLastButtons (page)="pageEvent = loadPermissionsData($event)"></mat-paginator>
+    </div>
+</mat-card>
+<ng-template #rowMenu let-id="id">
+    <div class="context-menu mat-elevation-z2" cdkMenu>
+        <button class="context-menu-item" cdkMenuItem (click)="openDialogForm(id)"><mat-icon>edit</mat-icon>&nbsp;Editar</button>
+        <button class="context-menu-item" style="color: red;" cdkMenuItem (click)="confirmDeletePermission(id)"><mat-icon>delete</mat-icon>&nbsp;Eliminar</button>
+    </div>
+</ng-template>
