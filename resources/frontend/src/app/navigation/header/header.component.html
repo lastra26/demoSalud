@@ -1,0 +1,48 @@
+<mat-toolbar class="bg-dark" style="height: 38px !important;">
+  <button mat-icon-button aria-label="Ir al inicio" routerLink="/">
+    <mat-icon style="color: white;">home</mat-icon>
+  </button>
+  <span class="header-links, font-header-elements" *ngIf="selectedApp">
+    <a *ngIf="selectedAppLink" routerLink="{{selectedAppLink.route}}">
+      {{selectedAppLink.name | uppercase}}
+    </a>
+  </span>
+  <span class="header-links, font-header-elements" *ngIf="!selectedApp"  style="color:whitesmoke;">
+    PLATAFORMA BASE
+  </span>
+
+  <div class="hide-gt-xs" *ngIf="menus && menus.length > 0" style="color: white;">
+    <button mat-icon-button [matMenuTriggerFor]="appMainMenu" xPosition="before"><mat-icon>arrow_drop_down</mat-icon></button>
+    <mat-menu #appMainMenu="matMenu">
+      <button mat-menu-item *ngFor="let item of menus" [matMenuTriggerFor]="navAppMenu" [matMenuTriggerData]="{identificador:item.identificador}"><mat-icon>{{ item.icon }}</mat-icon>{{ item.name }}</button>
+    </mat-menu>
+  </div>
+
+  <div class="hide-xs" style="color: white;">
+    <button mat-button *ngFor="let item of menus" [matMenuTriggerFor]="navAppMenu" [matMenuTriggerData]="{identificador:item.identificador}" class="menu-plataforma"><mat-icon>{{ item.icon }}</mat-icon><span fxShow.lt-sm="false">{{ item.name }}</span></button>
+  </div>
+  
+  <mat-menu #navAppMenu="matMenu">
+    <ng-template matMenuContent let-identificador="identificador">
+      <button mat-menu-item *ngFor="let item of modulos[identificador]" routerLink="{{item.route}}"><mat-icon>{{ item.icon }}</mat-icon> {{ item.name }}</button>
+    </ng-template>
+  </mat-menu>
+  
+  <span class="spacer"></span>
+  
+  <ng-template [ngIf]="isAuthenticated">
+    <button mat-icon-button cdkOverlayOrigin #verInfoAccount="cdkOverlayOrigin" (click)="(!showAccount)?(showAccount = true):showAccount" class="hide-xs">
+      <img src="{{user.avatar}}" alt=""  style="width:auto; margin:auto">
+    </button>
+    
+    <button mat-icon-button aria-label="Mostrar Sidenav" (click)="toggleSidenav()" class="hide-gt-xs">
+      <img src="{{user.avatar}}" alt="" style="width:auto; margin:auto">
+    </button>
+
+    <ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="verInfoAccount" [cdkConnectedOverlayOpen]="showAccount" (detach)="closeOverlay()" (overlayOutsideClick)="showAccount = false">
+      <div style="background-color: whitesmoke; color:#343a40; padding: 3px; width: 300px; box-shadow: 0px 7px 20px 0px black; border-radius: 4px;">
+        <session-user-menu [mode]="'menu'" (onClose)="closeOverlay()"></session-user-menu>
+      </div>
+    </ng-template>
+  </ng-template>
+</mat-toolbar>

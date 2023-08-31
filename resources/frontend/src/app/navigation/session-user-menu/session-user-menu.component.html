@@ -1,0 +1,42 @@
+<section class="flex-column" style="height: 100%;" [ngClass]="{'sidenav-mode':isSideNav,'menu-mode':!isSideNav}">
+    <div class="flex-column menu-card" style="height: 100%;">
+        <div class="card-header">
+            Usuario: {{user?.username}}
+        </div>
+        <div [ngClass]="{'flex-row':!isSideNav, 'flex-column':isSideNav}" *ngIf="user">
+            <div style="background-color: antiquewhite; display: flex; align-items: center; justify-content: center;">
+              <img src="{{user.avatar}}" alt="user avatar" style="width:80px; margin:10px">
+            </div>
+            <div class="flex-column flex-fill" style="font-size:0.8em; cursor: default;">
+              <div class="flex-column" style="padding: 5px;">
+                <div style="font-size: small; color:#676767">{{user.name}}</div>
+                <div style="font-size: small; color:#676767;">{{user.email}}</div>
+                <div style="font-size: smaller; color:#676767;">Verificado: {{(user.email_verified_at)?(user.email_verified_at | date:'longDate'):'correo no verificado'}}</div>
+              </div>
+              <div class="flex-fill"></div>
+              <div style="padding: 5px;">
+                <button mat-stroked-button style="width: 100%;" (click)="openEditProfile()">
+                  <mat-icon>edit</mat-icon> Editar Perfil
+                </button>
+              </div>
+            </div>
+        </div>
+        <div class="flex-fill flex-column" style="min-height: 250px;">
+            <div class="apps flex-row flex-fill" style="overflow: auto; height: 0;">
+              <figure routerLink="/apps" (click)="close()">
+                <mat-icon>home</mat-icon>
+                <figcaption class="ellipsis">Inicio</figcaption>
+              </figure>
+              <ng-container *ngFor="let app of apps; let i = index">
+                  <figure [routerLink]="['/'+app.route]" (click)="close()">
+                      <img src="{{ app.icon }}" alt="Icon">
+                      <figcaption class="ellipsis">{{ app.name }}</figcaption>
+                  </figure>
+              </ng-container>
+            </div>
+        </div>
+        <div>
+            <button mat-stroked-button (click)="logout()" style="margin:5px; width:calc(100% - 10px);"><mat-icon>exit_to_app</mat-icon>Cerrar Sesión</button>
+        </div>
+    </div>
+</section>
