@@ -1,0 +1,59 @@
+@media(max-width: 599.98px){
+    .apps-list .app{
+        width: calc(33.333% - 20px) !important;
+    }
+
+    .apps-list .app img {
+        width: 80% !important;
+        height: auto !important;
+    }
+}
+
+@media(max-width: 959.98px) and (orientation: landscape){
+    .apps-list .app{
+        width: calc(15% - 20px) !important;
+    }
+}
+
+.container {
+    width:100%; 
+    height:100%;
+    flex-direction: column;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    justify-content: center;
+}
+
+.apps-list{
+    width: 100%;
+}
+
+.apps-list .app{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 128px;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.apps-list .app:hover{
+    background-color: rgba(0,0,0,0.10);
+    border-radius: 8px;
+}
+
+.apps-list .app img {
+    display: block;
+    width: 90%;
+    height: auto;
+    margin:auto;
+    margin-top:15px;      
+    margin-bottom:15px;  
+}
+
+.apps-list .app figcaption{
+    text-align: center;
+    font-weight: 500;
+    color: #363636;
+}

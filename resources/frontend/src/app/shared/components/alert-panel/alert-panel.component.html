@@ -1,0 +1,16 @@
+<div *ngIf="panelVisible"  class="flex-row alert-panel {{alertData.type}}">
+    <div class="icon">
+        <mat-icon>
+            {{alertData.icon}}
+        </mat-icon>
+    </div>
+    <div class="flex-fill message">
+        {{alertData.message}}
+    </div>
+    <div>
+        <mat-progress-spinner class="translucent-progress-spinner countdown" [diameter]="20" [mode]="'determinate'" [value]="count"></mat-progress-spinner>
+    </div>
+    <div>
+        <button mat-icon-button (click)="closePanel()"><mat-icon>clear</mat-icon></button>
+    </div>
+</div>

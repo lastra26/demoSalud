@@ -1,0 +1,15 @@
+.form-container > * {
+    width: 100%;
+}
+
+.title{
+    font-size: x-large;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.dialog-confirm{
+    padding: 8px; 
+    min-width: 250px;
+    cursor: default;
+}
