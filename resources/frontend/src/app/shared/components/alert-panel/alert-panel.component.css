@@ -1,0 +1,39 @@
+.alert-panel{
+    cursor: default;
+    font-weight: 400;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: small;
+    padding-left: 5px;
+    background-color: hsl(45, 90%, 65%);
+    color: hsl(45, 100%, 35%);
+}
+
+.alert-panel .message{
+    padding: 0px 5px;
+}
+
+.alert-panel.success{
+    background-color: hsl(125, 58%, 48%);
+    color: hsl(125, 80%, 98%);
+}
+
+.alert-panel.error{
+    background-color: hsl(0, 64%, 55%);
+    color: hsl(0, 80%, 98%);
+}
+
+.alert-panel.warning{
+    background-color: hsl(29, 95%, 63%);
+    color: hsl(29, 80%, 98%);
+}
+
+.alert-panel.info{
+    background-color: hsl(201, 100%, 44%);
+    color: hsl(201, 80%, 90%);
+}
+
+.countdown{
+    color:whitesmoke !important;
+}

@@ -1,0 +1,23 @@
+<div class="strength" fxLayout="column">
+  <div fxFlex="none" fxLayout="column">
+    <div fxFlex="none">{{barLabel}}</div>
+    <div fxFlex="none">
+      <ul class="strengthBar">
+        <li class="point" [style.background-color]="bar0">{{(currentStrengthValue==1)?msg:''}}</li>
+        <li class="point" [style.background-color]="bar1">{{(currentStrengthValue==2)?msg:''}}</li>
+        <li class="point" [style.background-color]="bar2">{{(currentStrengthValue==3)?msg:''}}</li>
+        <li class="point" [style.background-color]="bar3">{{(currentStrengthValue==4)?msg:''}}</li>
+        <li class="point" [style.background-color]="bar4">{{(currentStrengthValue==5)?msg:''}}</li>
+      </ul>
+    </div>
+  </div>
+  <div fxFlex="none">
+    <ul class="check-list">
+      <li [ngClass]="{'checked':checkList.lower}"><mat-icon>{{(checkList.lower)?'check_circle':'radio_button_unchecked'}}</mat-icon> Al menos una Minúscula</li>
+      <li [ngClass]="{'checked':checkList.upper}"><mat-icon>{{(checkList.upper)?'check_circle':'radio_button_unchecked'}}</mat-icon> Al menos una Mayúscula</li>
+      <li [ngClass]="{'checked':checkList.number}"><mat-icon>{{(checkList.number)?'check_circle':'radio_button_unchecked'}}</mat-icon> Al menos un Número</li>
+      <li [ngClass]="{'checked':checkList.symbol}"><mat-icon>{{(checkList.symbol)?'check_circle':'radio_button_unchecked'}}</mat-icon> Al menos un Simbolo: #$%&=@+,.;:~^¿?!¡</li>
+      <li class="optional" [ngClass]="{'checked':checkList.optimLength}"><mat-icon>{{(checkList.optimLength)?'check_circle':'radio_button_unchecked'}}</mat-icon> Longitud mayor a 11 caracteres</li>
+    </ul>
+  </div>
+</div>

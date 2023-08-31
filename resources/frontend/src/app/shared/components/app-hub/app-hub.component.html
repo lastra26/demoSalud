@@ -1,0 +1,10 @@
+<section class="container">
+    <div class="flex-row flex-wrap flex-justify-center apps-list">
+        <ng-container *ngFor="let app of apps">
+            <div (click)="goTo(app.route)" class="app">
+                <img src="{{ app.icon }}" alt="Icon">
+                <figcaption>{{ app.name }}</figcaption>
+            </div>
+        </ng-container>
+    </div>
+</section>

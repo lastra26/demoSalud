@@ -1,0 +1,48 @@
+.strengthBar {
+    display: inline;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    vertical-align: 2px;
+    width: 100%;
+}
+  
+.point:last-of-type {
+    margin: 0 !important;
+}
+  
+.point {
+    background: #DDD;
+    border-radius: 2px;
+    display: inline-block;
+    min-height: 5px;
+    text-align: center;
+    /*margin-right: 1px;
+    width: 62px;*/
+    width: 20%;
+    font-size: x-small;
+    font-weight: 500;
+    color: whitesmoke
+}
+
+.check-list{
+    list-style: none;
+    font-weight: 500;
+    padding: 0px 20px;
+}
+
+.check-list li{
+    font-size: small;
+    display: flex;
+    align-items: center;
+    color: red;
+    cursor: default;
+}
+
+.check-list li.optional{
+    color: #545050;
+}
+
+.check-list li.checked{
+    color: green !important;
+}
