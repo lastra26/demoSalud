@@ -1,0 +1,83 @@
+.menu-card{
+    background-color: whitesmoke;
+}
+
+.menu-card > div:not(:last-child){
+    border-bottom: 1px solid rgba(0,0,0,0.50);
+}
+
+.menu-mode{
+    max-height: 600px;
+}
+
+.sidenav-mode{
+    max-height: 100%;
+}
+
+.menu-mode .card-header{
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+.menu-card .card-header{
+    background-color: #343a40;
+    color: whitesmoke;
+    text-align: center;
+    font-weight: 500;
+    font-size: large;
+    padding: 8px;
+}
+
+.apps {    
+    display: flex;
+    flex:1;
+    width:100%;
+    margin: auto;
+    height: auto;
+    flex-direction: row;
+    justify-content: flex-start;    
+    align-content: flex-start;
+    flex-wrap: wrap;
+    flex-flow: row wrap;
+}
+
+.apps .ellipsis{
+    line-height: normal;
+}
+
+.apps figure {
+    display: block;
+    flex-direction: column;
+    text-align: center; 
+    width: 33.33%;
+    min-width: 50px;
+    margin:0;  
+    cursor: pointer; 
+}
+ 
+.apps figure img,
+.apps figure .mat-icon {
+    display: block;
+    width:50px;
+    height: 50px;
+    margin:auto;
+    margin-top:15px;
+    margin-bottom:15px;  
+}
+
+.apps figure .mat-icon{
+    font-size: 50px;
+    line-height: normal;
+}
+
+.apps figure:hover{
+    background-color: rgba(0,0,0,0.10);
+    border-radius: 5px;
+}
+
+.apps figcaption{
+    font-size: 0.75em;
+    color: #555;    
+    margin-bottom:15px;  
+    padding:0 5px;
+}

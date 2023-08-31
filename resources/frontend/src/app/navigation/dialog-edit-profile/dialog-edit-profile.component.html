@@ -1,0 +1,113 @@
+<div class="dialog-container flex-column" (document:keydown.escape)="cancelarAccion()">
+    <div class="dialog-toolbar">
+        <div class="flex-row">
+            <div class="label-info">
+                <mat-icon>account_circle</mat-icon>&nbsp;Perfil
+            </div>
+            <button mat-button [disabled]="!formPerfil.valid" (click)="guardarPerfil()">
+                <mat-icon>save</mat-icon>&nbsp;Guardar
+            </button>
+            <div class="flex-fill"></div>
+            <button mat-button class="boton-cerrar" (click)="cerrar()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <alert-panel></alert-panel>
+    <mat-progress-bar [mode]="(isSaving)?'indeterminate':'query'" *ngIf="isLoading || isSaving"></mat-progress-bar>
+    <div class="flex-fill flex-column">
+        <div class="flex-row" style="padding: 8px;">
+            <button mat-stroked-button color="primary" style="height: auto;" (click)="isSelectAvatarOpen = !isSelectAvatarOpen" cdkOverlayOrigin #trigger="cdkOverlayOrigin">
+                <img src="{{selectedAvatar}}" alt="" style="height:100%; margin:5px;"><br>
+                Cambiar Avatar
+            </button>
+            <div class='flex-fill'>
+                <div class="fake-input">
+                    <div class="label">Usuario:</div>
+                    <div class="value">{{userName}}</div>
+                </div>
+                <div class="fake-input">
+                    <div class="label">Fecha de Registro:</div>
+                    <div class="value">{{createdAt | date:'longDate'}}</div>
+                </div>
+            </div>
+        </div>
+        <ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="trigger" [cdkConnectedOverlayOpen]="isSelectAvatarOpen" (overlayOutsideClick)="isSelectAvatarOpen = false">
+            <mat-card>
+                <div class="avatars-list">
+                    <div class="flex-fill avatars-container">
+                        <div class="flex-row flex-wrap" style="max-height: 200px; overflow: auto;">
+                            <div class="avatar" *ngFor="let avatar of avatarsList" (click)="setAvatar(avatar.file)" [ngClass]="{'selected':selectedAvatar == avatar.file}">
+                                <mat-icon style="width: 100%; height: 100%;" svgIcon="{{avatar.id}}"></mat-icon>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-card>
+        </ng-template>
+        <div class="flex-fill flex-column flex-gap" style="padding: 8px;" [formGroup]="formPerfil">
+            <div class="flex-column flex-gap flex-wrap">
+                <mat-form-field appearance="fill" class="flex-fill">
+                    <mat-label>Nombre Completo: </mat-label>
+                    <input type="text" matInput autocomplete="off" formControlName="name" placeholder="Nombre Completo" required cdkFocusInitial>
+                    <mat-error *ngIf="formPerfil.get('name').hasError('required')">Este campo es obligatorio</mat-error>
+                </mat-form-field>
+    
+                <mat-form-field appearance="fill" class="flex-fill">
+                    <mat-label>Correo Electrónico: </mat-label>
+                    <input type="text" matInput autocomplete="off" id="email" formControlName="email" placeholder="Correo Electrónico" required>
+                    <mat-icon matSuffix *ngIf="verifiedEmail">check_circle</mat-icon>
+                    <mat-error *ngIf="formPerfil.get('email').hasError('required')">El Correo Electrónico es obligatorio</mat-error>
+                    <mat-error *ngIf="formPerfil.get('email').hasError('email')">Formato incorrecto</mat-error>
+                    <mat-error *ngIf="formPerfil.get('email').hasError('duplicated')">Este Correo Electrónico ya esta registrado</mat-error>
+                </mat-form-field>
+
+                <button mat-stroked-button class="flex-fill" color="{{(manualPass)?'primary':''}}" (click)="toggleManualPass()">
+                    <mat-icon>{{(manualPass)?'arrow_drop_up':'arrow_drop_down'}}</mat-icon> Cambiar Contraseña
+                </button>
+            </div>
+            <div class="flex-column flex-gap flex-wrap"  *ngIf="manualPass">
+                <mat-form-field class="flex-fill" appearance="outline">
+                    <mat-label>Contraseña Actual:</mat-label>
+                    <input matInput #inputPassword formControlName="old_password" placeholder="Contraseña Actual" [type]="hideOldPassword ? 'password' : 'text'" required>
+                    <button mat-icon-button matSuffix (click)="hideOldPassword = !hideOldPassword" [attr.aria-label]="'Hide Old password'" [attr.aria-pressed]="hideOldPassword" tabindex="-1">
+                        <mat-icon>{{hideOldPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                    </button>
+                    <mat-hint align="end">{{formPerfil.get('old_password').value.length || 0}}</mat-hint>
+                    <mat-error *ngIf="formPerfil.get('old_password').hasError('required')">Confirmar Contraseña</mat-error>
+                    <mat-error *ngIf="formPerfil.get('old_password').hasError('wrongpassword')">Contraseña incorrecta</mat-error>
+                    <mat-error *ngIf="formPerfil.get('old_password').hasError('minlength')">Debe contener al menos 8 caracteres</mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="flex-fill" appearance="outline">
+                    <mat-label><mat-icon *ngIf="formPerfil.get('valid_password').value">check_circle</mat-icon> Nueva Contraseña:</mat-label>
+                    <input matInput formControlName="password" placeholder="Nueva  Contraseña" [type]="hidePassword ? 'password' : 'text'" required [matAutocomplete]="autoPass">
+                    <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword" tabindex="-1">
+                        <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                    </button>
+                    <mat-autocomplete #autoPass="matAutocomplete">
+                        <mat-option [value]="true" disabled style="opacity: 1 !important;">
+                            <strength-checker barLabel="Fortaleza: " [passwordToVerify]="formPerfil.get('password').value" (passwordStrength)="passwordValid($event)"></strength-checker>
+                        </mat-option>
+                    </mat-autocomplete>
+                    <mat-hint align="end">{{formPerfil.get('password').value.length || 0}}</mat-hint>
+                    <mat-error *ngIf="formPerfil.get('password').hasError('minlength')">Debe contener al menos 8 caracteres</mat-error>
+                    <mat-error *ngIf="formPerfil.get('password').hasError('required')">La Contraseña es obligatoria</mat-error>
+                    <mat-error *ngIf="formPerfil.get('password').hasError('lowstrenght')">La Contraseña no es segura</mat-error>
+                    <mat-error *ngIf="formPerfil.get('password').hasError('samepassword')">La Nueva Contraseña es incorrecta</mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="flex-fill" appearance="outline">
+                    <mat-label>Confirmar Contraseña:</mat-label>
+                    <input matInput formControlName="confirm_password" placeholder="Confirmar Contraseña" [type]="hideConfirmPassword ? 'password' : 'text'" required>
+                    <button mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hideConfirmPassword" tabindex="-1">
+                        <mat-icon>{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                    </button>
+                    <mat-hint align="end">{{formPerfil.get('confirm_password').value.length || 0}}</mat-hint>
+                    <mat-error *ngIf="formPerfil.get('confirm_password').hasError('required')">Confirmar Contraseña</mat-error>
+                    <mat-error *ngIf="formPerfil.get('confirm_password').hasError('fieldMatch')">Las contraseñas no coinciden</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+</div>
