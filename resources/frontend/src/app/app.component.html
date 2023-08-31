@@ -1,0 +1,13 @@
+<mat-sidenav-container fullscreen style="height: 100%;">
+  <mat-sidenav #sidenav role="navigation" position="end" [autoFocus]="false" >
+      <sidenav-list (onCloseSidenav)="sidenav.close()"></sidenav-list>
+  </mat-sidenav>
+  <mat-sidenav-content class="flex-column flex-fill" style="height: 100%; display: flex;">
+    <app-header (onSidenavToggle)="sidenav.toggle()" style="width:100%;"></app-header>
+    <main class="flex-fill flex-column">
+        <mat-drawer-container class="flex-fill module-container" autosize>
+            <router-outlet></router-outlet>
+        </mat-drawer-container>
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

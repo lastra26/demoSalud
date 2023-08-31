@@ -1,0 +1,62 @@
+<section class="flex-colum" style="padding: 8px;">
+    <div style="padding-bottom: 10px;">
+        El usuario <span style="font-weight: 600;">{{inData.user.username}}</span> no se encuentra activo, para activarlo es necesario restablecer la contraseña:
+    </div>
+    <div class="flex-fill flex-row flex-justify-center">
+        <div class="flex-row flex-xs-column flex-gap" style="width: 100%;" [formGroup]="formPasswords">
+            <div class="flex-fill flex-column">
+                <mat-form-field appearance="outline">
+                    <mat-label>Contraseña Temporal:</mat-label>
+                    <input matInput formControlName="password" placeholder="Contraseña" [type]="showPassword ? 'text' : 'password'" required>
+                    <button mat-icon-button matSuffix (click)="showPassword = !showPassword" [attr.aria-label]="'Show password'" [attr.aria-pressed]="showPassword" tabindex="-1">
+                        <mat-icon>{{showPassword ? 'visibility' : 'visibility_off'}}</mat-icon>
+                    </button>
+                    <mat-hint align="end">{{formPasswords.get('password').value.length || 0}}</mat-hint>
+                    <mat-error *ngIf="formPasswords.get('password').hasError('minlength')">Debe contener al menos 8 caracteres</mat-error>
+                    <mat-error *ngIf="formPasswords.get('password').hasError('required')">La Contraseña es obligatoria</mat-error>
+                    <mat-error *ngIf="formPasswords.get('password').hasError('wrongPass')">Contraseña Incorrecta</mat-error>
+                </mat-form-field>
+            </div>
+            <div class="flex-fill flex-column">
+                <mat-form-field appearance="outline">
+                    <mat-label>Nueva Contraseña:</mat-label>
+                    <input matInput formControlName="new_password" placeholder="Contraseña" [type]="showNewPassword ? 'text' : 'password'" required>
+                    <button mat-icon-button matSuffix (click)="showNewPassword = !showNewPassword" [attr.aria-label]="'Show password'" [attr.aria-pressed]="showNewPassword" tabindex="-1">
+                        <mat-icon>{{showNewPassword ? 'visibility' : 'visibility_off'}}</mat-icon>
+                    </button>
+                    <mat-hint align="end">{{formPasswords.get('new_password').value.length || 0}}</mat-hint>
+                    <mat-error *ngIf="formPasswords.get('new_password').hasError('minlength')">Debe contener al menos 8 caracteres</mat-error>
+                    <mat-error *ngIf="formPasswords.get('new_password').hasError('required')">La Contraseña es obligatoria</mat-error>
+                </mat-form-field>
+    
+                <div>
+                    <strength-checker barLabel="Fortaleza: " [passwordToVerify]="formPasswords.get('new_password').value" (passwordStrength)="passwordValid($event)"></strength-checker>
+                </div>
+    
+                <mat-form-field appearance="outline">
+                    <mat-label>Confirmar Contraseña:</mat-label>
+                    <input matInput formControlName="confirm_password" placeholder="Confirmar Contraseña" (keyup.enter)="activateUser()" [type]="showConfirmPassword ? 'text' : 'password'" required>
+                    <button mat-icon-button matSuffix (click)="showConfirmPassword = !showConfirmPassword" [attr.aria-label]="'Show password'" [attr.aria-pressed]="showConfirmPassword" tabindex="-1">
+                        <mat-icon>{{showConfirmPassword ? 'visibility' : 'visibility_off'}}</mat-icon>
+                    </button>
+                    <mat-hint align="end">{{formPasswords.get('confirm_password').value.length || 0}}</mat-hint>
+                    <mat-error *ngIf="formPasswords.get('confirm_password').hasError('required')">Confirmar Contraseña</mat-error>
+                    <mat-error *ngIf="formPasswords.get('confirm_password').hasError('fieldMatch')">Las contraseñas no coinciden</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+</section>
+<div *ngIf="errorMessage" class="error-message">
+    {{errorMessage}}
+</div>
+<mat-progress-bar mode="indeterminate" *ngIf="isLoading" ></mat-progress-bar>
+<section class="flex-row flex-gap" style="padding: 8px; background-color: whitesmoke; border-top: 1px solid darkgrey;">
+    <div class="flex-fill"></div>
+    <div>
+        <button mat-raised-button (click)="cerrar()">Cancelar</button>
+    </div>
+    <div>
+        <button mat-raised-button color="primary" (click)="activateUser()" [disabled]="formPasswords.invalid || isLoading"><mat-icon>login</mat-icon> Activar</button>
+    </div>
+</section>

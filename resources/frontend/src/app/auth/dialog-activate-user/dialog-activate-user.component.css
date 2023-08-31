@@ -1,0 +1,6 @@
+.error-message{
+    background-color: hsl(0, 100%, 60%);
+    color: hsl(63, 100%, 45%);
+    padding: 8px;
+    text-align: left;
+}

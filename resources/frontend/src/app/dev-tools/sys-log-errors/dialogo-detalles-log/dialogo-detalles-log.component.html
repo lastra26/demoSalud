@@ -1,0 +1,80 @@
+<section class="flex-column" style="height: 100%; overflow: hidden; flex: 1 1 0%;"> <!-- Main Body <<<<<<< -->
+    <section class="dialog-toolbar"> <!-- Toolbar Menu <<<<<<< -->
+        <div class="flex-row">
+            <div *ngIf="logData" class="flex-fill flex-row label-info">
+                <div class="label-folio">
+                    {{logData.id}}
+                </div>
+                <div class="label-data hide-xs">
+                    {{logData.created_at | date:'MMMM d, y - h:mm a'}}
+                </div>
+                <div class="flex-fill"></div>
+                <div class="label-data hide-xs" [matTooltip]="logData.usuario.name + ' : ' + logData.logged_user_id">
+                    {{logData.usuario.username}}
+                </div>
+                <div class="flex-fill"></div>
+                <div class="label-data hide-xs">
+                    {{logData.ip}}
+                </div>
+                <div class="flex-fill"></div>
+                <div class="label-data hide-xs">
+                    Código: {{logData.code}}
+                </div>
+            </div>
+            <button mat-button class="boton-accion" (click)="resizeDialog()"><mat-icon>{{(dialogMaxSize)?'fit_screen':'fullscreen'}}</mat-icon></button>
+            <button class="boton-accion boton-cerrar" mat-button (click)="cerrar()"><mat-icon>close</mat-icon></button>
+        </div>
+        <mat-progress-bar *ngIf="isLoading" mode="indeterminate" [color]="'primary'"></mat-progress-bar>
+    </section> <!-- <<<<<<< Toolbar Menu -->
+
+    <section class="flex-fill flex-column flex-gap" style="padding:8px;" *ngIf="logData">
+        <mat-card class="flex-row flex-wrap flex-gap info-panel">
+            <div class="flex-row" style="width: 100%;">
+                <div class="fake-input hide-xs">
+                    <span class="label">Metodo:</span>
+                    <span class="value">{{logData.method}}</span>
+                </div>
+                <div class="flex-fill fake-input">
+                    <span class="label">Url:</span>
+                    <span class="value hide-xs">{{logData.url}}</span>
+                    <span class="value hide-gt-xs">{{logData.url.replaceAll('/','-')}}</span>
+                </div>
+            </div>
+            <div class="flex-row" style="width: 100%;">
+                <div class="flex-fill fake-input">
+                    <span class="label">Archivo:</span>
+                    <span class="value hide-xs">{{logData.file}}&nbsp;({{logData.line}})</span>
+                    <span class="value hide-gt-xs">{{logData.file.substring(logData.file.lastIndexOf('\\')+1)}}&nbsp;({{logData.line}})</span>
+                </div>
+            </div>
+            <div class="flex-row hide-xs" style="width: 100%;">
+                <div class="flex-fill fake-input">
+                    <span class="label">Cliente:</span>
+                    <span class="value">{{logData.browser_info}}</span>
+                </div>
+            </div>
+            <div class="flex-row" style="width: 100%;">
+                <div class="flex-fill fake-input">
+                    <span class="label">Mensaje:</span>
+                    <span class="value-text">{{logData.message}}</span>
+                </div>
+            </div>
+        </mat-card>
+        <section class="flex-fill flex-column flex-gap debug-panel">
+            <mat-card class="flex-fill flex-column trace-panel">
+                <div class="title">Trace Log:</div>
+                <div class="flex-fill flex-column content">
+                    <div class="item" *ngFor="let file of logData.trace">
+                        <pre><p>{{file | json}}</p></pre>
+                    </div>
+                </div>
+            </mat-card>
+            <mat-card class="flex-fill flex-column parameters-panel" *ngIf="logData.parameters">
+                <div class="title">Parametros:</div>
+                <div class="flex-fill content">
+                    <pre><p>{{logData.parameters | json}}</p></pre>
+                </div>
+            </mat-card>
+        </section>
+    </section>
+</section>

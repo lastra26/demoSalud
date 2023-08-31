@@ -1,0 +1,28 @@
+@media(max-width: 599.98px){
+    .file{
+        font-weight: 300 !important;
+    }
+}
+
+.method{
+    background-color: lightseagreen;
+    border-radius: 3px;
+    text-align: center;
+    padding: 2px 5px;
+    font-size: small;
+    font-weight: 500;
+    color: whitesmoke;
+}
+
+.url{
+    font-weight: 500;
+}
+
+.file{
+    font-size: small;
+    font-weight: 400;
+}
+
+.line{
+    color: darkgrey;
+}
