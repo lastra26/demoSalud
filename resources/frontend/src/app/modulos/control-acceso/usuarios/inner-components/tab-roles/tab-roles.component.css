@@ -1,0 +1,50 @@
+.roles-panel{
+    overflow: auto;
+    padding: 5px;
+}
+
+.roles-panel .mdc-list-item{
+    height: auto !important;
+    min-height: 48px;
+    padding-right: 0px;
+}
+
+.roles-panel .mdc-list-item:hover{
+    background: rgba(0,0,0,.04);
+}
+
+.role-group{
+    display: block;
+    font-size: small;
+    color: slategray;
+}
+
+.role-item{
+    width: 100%;
+}
+
+.role-item:not(:first-child){
+    border-top: 1px solid darkgray;
+}
+
+.role-item .action-button{
+    padding: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.role-item .label{
+    display: flex;
+    align-items: center;
+    white-space: normal !important;
+    width: fit-content;
+    font-weight: 500;
+}
+
+.role-item .label .mat-icon{
+    margin: 0;
+    line-height: normal;
+    height: 20px;
+    width: 20px;
+    font-size: 24px;
+}

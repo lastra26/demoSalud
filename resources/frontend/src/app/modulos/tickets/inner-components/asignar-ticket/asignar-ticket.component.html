@@ -1,0 +1,196 @@
+<section class="flex-column" style="height: 100%; overflow: hidden; flex: 1 1 0%;" (document:keydown.escape)="cancelarAccion()"> <!-- Main Body <<<<<<< -->
+    <section class="dialog-toolbar"> <!-- Toolbar Menu <<<<<<< -->
+        <div class="flex-row">
+            <div class="label-info" >
+                Asignar Ticket
+            </div>
+            <!-- <button mat-button [matMenuTriggerFor]="menuAddColaboradores" aria-label="Menú" [disabled]="isLoading || isSaving">
+                <mat-icon>settings</mat-icon><span class="hide-xs">Opciones&nbsp;</span><mat-icon>arrow_drop_down</mat-icon>
+            </button>
+            <mat-menu #menuAddColaboradores="matMenu">
+                <button mat-menu-item *ngIf="seguimiento?.seguimiento_id">
+                    <mat-icon>{{'group_add'}}</mat-icon><span class="hide-xs">&nbsp;Agregar Colaborador</span>
+                </button>
+                <mat-divider></mat-divider>
+            </mat-menu> -->
+            <button mat-button (click)="asignarTicket()" [disabled]="isLoading || isSaving || dataColaboradores.length === 0">
+                <mat-icon>{{'save'}}</mat-icon><span class="hide-xs">&nbsp;Guardar</span>
+            </button>
+            <!-- <button  mat-button (click)="agregarColaborador()" *ngIf="seguimiento.id">
+                <mat-icon>{{'group_add'}}</mat-icon><span class="hide-xs">&nbsp;Agregar Colaborador</span>
+            </button> -->
+            <div class="flex-fill"></div>
+            <div class="label-info screen-size-icon" *ngIf="currentScreenSize == 'xs' || currentScreenSize == 'sm'">
+                <mat-icon>phone_iphone</mat-icon>
+            </div>
+            <button mat-button class="boton-accion" (click)="resizeDialog()" [matTooltip]="(dialogMaxSize)?'Restaurar':'Maximizar'" [matTooltipPosition]="'left'" tabindex="-1" *ngIf="currentScreenSize != 'xs' && currentScreenSize != 'sm'">
+                <mat-icon>{{(dialogMaxSize)?'fit_screen':'fullscreen'}}</mat-icon>
+            </button>
+            <button class="boton-accion boton-cerrar" mat-button (click)="cerrar()" tabindex="-1"><mat-icon>close</mat-icon></button>
+        </div>
+    </section> <!-- <<<<<<< Toolbar Menu -->
+    <mat-progress-bar *ngIf="isLoading || isSaving" [mode]="(isSaving)?'indeterminate':'query'" [color]="(isSaving )?'accent':'primary'"></mat-progress-bar>
+    <section>
+        <alert-panel></alert-panel>
+    </section>
+
+
+
+
+    <section class="flex-fill flex-column" style="padding:8px; overflow: auto;" [formGroup]="formAsignarTicket">
+
+        <section class="flex-fill flex-column" style="padding:8px; overflow: auto;">
+            <div class="flex-fill flex-column flex-gap">
+                <mat-card class="flex-column flex-gap xs-max-height-asignar-ticket-form" style="padding: 8px;">
+
+                    <div class="flex-row flex-xs-column flex-fill flex-gap">
+
+                        <mat-form-field appearance="fill" class="flex-fill">
+                            <mat-label>Fechas Estimadas de Solución: </mat-label>
+                            <mat-date-range-input [rangePicker]="rangePicker">
+                                <input matStartDate [(ngModel)]="fechas.rango_fechas.inicio" formControlName="fecha_inicio" placeholder="Inicio" readonly>
+                                <input matEndDate [(ngModel)]="fechas.rango_fechas.fin" formControlName="fecha_fin" placeholder="Fin" readonly>
+                            </mat-date-range-input>
+                            <mat-datepicker-toggle matSuffix [for]="rangePicker"></mat-datepicker-toggle>
+                            <mat-date-range-picker #rangePicker disabled="false">
+                                <mat-date-range-picker-actions>
+                                <button mat-button matDateRangePickerCancel>Cancelar</button>
+                                <button mat-raised-button color="primary" matDateRangePickerApply (click)="checarFechasFiltro()">Aplicar</button>
+                                </mat-date-range-picker-actions>
+                            </mat-date-range-picker>
+                        </mat-form-field>
+
+                        <!-- <mat-form-field class="flex-fill">
+                            <mat-label>Buscar Colaborador...</mat-label>
+                            <input matInput placeholder="Buscar" [matAutocomplete]="colaboradoresAutocomplete" formControlName='colaborador' autocomplete="off" >
+                            <button mat-icon-button matSuffix>
+                                <mat-icon>search</mat-icon>
+                            </button>
+                            <mat-autocomplete #colaboradoresAutocomplete="matAutocomplete" [displayWith]="displayColaboradorFn">
+                                <mat-option *ngIf="colaboradorIsLoading" class="is-loading" ><mat-spinner diameter="25"></mat-spinner></mat-option>
+                                <ng-container *ngIf="!colaboradorIsLoading">
+                                    <mat-option *ngFor="let colaborador of filteredColaboradores" [value]="colaborador">
+                                        {{ colaborador.nombre_completo }} - {{colaborador.hora_entrada}} / {{colaborador.hora_salida}}
+                                    </mat-option>
+                                </ng-container>
+                            </mat-autocomplete>
+                            <input type="hidden" formControlName='colaborador'>
+                        </mat-form-field> -->
+
+                        <mat-form-field appearance="fill" class="flex-fill" *ngIf="!catalogos['colaboradores']">
+                            <mat-label>Colaborador: </mat-label>
+                            <input matInput formControlName="colaborador">
+                            <mat-hint>Escribe el nombre del Colaborador</mat-hint>
+                            <mat-error *ngIf="formAsignarTicket.get('colaborador').hasError('required')">Este campo es obligatorio</mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="fill" class="flex-fill" *ngIf="catalogos['colaboradores']">
+                            <mat-label>Colaborador: </mat-label>
+                            <input type="text" aria-label="colaborador" matInput formControlName="colaborador" [matAutocomplete]="crAutocomplete" required (blur)="checkAutocompleteValue('colaborador')">
+                            <mat-autocomplete #crAutocomplete="matAutocomplete" [displayWith]="getDisplayFn('nombre_completo')">
+                                <mat-option *ngFor="let colaborador of filteredCatalogs['colaboradores'] | async" [value]="colaborador" [disabled]="colaborador?.isAssigned === true">
+                                    {{ colaborador.nombre_completo }} - {{colaborador.hora_entrada}} / {{colaborador.hora_salida}}
+                                </mat-option>
+                            </mat-autocomplete>
+                            <mat-hint *ngIf="!formAsignarTicket.get('colaborador').value">Selecciona un Colaboradore la lista</mat-hint>
+                            <mat-hint [style.text-align]="'start'" *ngIf="formAsignarTicket.get('colaborador').value">Horario: [ {{formAsignarTicket.get('colaborador').value.hora_entrada}} - {{formAsignarTicket.get('colaborador').value.hora_salida}}]</mat-hint>
+                            <mat-error *ngIf="formAsignarTicket.get('colaborador').hasError('required')">Este campo es obligatorio</mat-error>
+                        </mat-form-field>
+
+                        <!-- (optionSelected)="cargarPersonal($event)" -->
+                
+                    </div>
+
+                    <div class="flex-row flex-xs-column flex-fill flex-gap">
+
+                        <mat-form-field appearance="fill" class="flex-fill">
+                            <mat-label>Observaciones: </mat-label>
+                            <textarea (input)="changeTextToUppercase('observaciones')" matInput formControlName="observaciones" placeholder="Observaciones"></textarea>
+                            <mat-hint>Escribe las Observaciones</mat-hint>
+                            <mat-error *ngIf="formAsignarTicket.get('observaciones').hasError('required')">Este campo es obligatorio</mat-error>
+                        </mat-form-field>
+
+                    </div>
+
+                    <div class="flex-row">
+                        <button class="flex-xs-fill" mat-raised-button color="primary" (click)="agregarColaboradores(formAsignarTicket);" [disabled]="!formAsignarTicket.valid || isEdit">
+                            <mat-icon>{{'group_add'}}</mat-icon><span class="hide-xs">&nbsp;Agregar</span>
+                        </button>
+                        &nbsp;
+                        <button  class="flex-xs-fill" mat-raised-button color="green" (click)="saveEditColaborador(formAsignarTicket);" [disabled]="!isEdit">
+                            <mat-icon>{{'save'}}</mat-icon><span class="hide-xs">&nbsp;Guardar</span>
+                        </button>
+                    </div>
+
+                </mat-card>
+
+                <mat-card class="table-card flex-fill">
+                    <div class="flex-column" style="height: 100%;">
+                        <div class="main-list-table left-click-open flex-fill">
+    
+                            <table #tableColaboradores mat-table [dataSource]="dataSourceColaboradores" >
+                
+                                <ng-container matColumnDef="no">
+                                    <th mat-header-cell *matHeaderCellDef class="hide-sm hide-xs"> # </th>
+                                    <td mat-cell *matCellDef="let element; let i = index;" class="hide-sm hide-xs"> {{i+1}} </td>
+                                </ng-container>
+    
+                                <ng-container matColumnDef="no_seguimiento">
+                                    <th mat-header-cell *matHeaderCellDef> N° Seguimiento </th>
+                                    <td mat-cell *matCellDef="let element"> {{ element.seguimiento_id }} </td>
+                                </ng-container>
+    
+                                <ng-container matColumnDef="fechas_solucion">
+                                    <th mat-header-cell *matHeaderCellDef> Fechas de Solución </th>
+                                    <td mat-cell *matCellDef="let element"> {{ element.fecha_inicio | date:'dd/MM/y' }} - {{ element.fecha_fin | date:'dd/MM/y' }} </td>
+                                </ng-container>
+                                
+                                <ng-container matColumnDef="nombre_completo">
+                                    <th mat-header-cell *matHeaderCellDef> Colaborador </th>
+                                    <td mat-cell *matCellDef="let element"> {{ element.colaborador?.nombre_completo }} </td>
+                                </ng-container>
+    
+                                <ng-container matColumnDef="observaciones">
+                                    <th mat-header-cell *matHeaderCellDef class="hide-sm hide-xs"> Observaciones </th>
+                                    <td mat-cell *matCellDef="let element" class="hide-sm hide-xs"> {{ element.observaciones }}</td>
+                                </ng-container>
+                
+                                <ng-container matColumnDef="actions">
+                                    <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                                    <td mat-cell *matCellDef="let element; let i = index;">
+                                        <button mat-icon-button color="warn" (click)="quitarColaborador(element, i)" [disabled]="isEdit"><mat-icon>delete</mat-icon></button>
+                                    </td>
+                                </ng-container>
+    
+                                <ng-container matColumnDef="noResultsFound">
+                                    <td mat-footer-cell *matFooterCellDef [attr.colspan]="displayedColumnsColaboradores.length" class="no-results-found elements-center">
+                                        No se encontraron registros 
+                                    </td>
+                                </ng-container>
+    
+                
+                                <tr mat-header-row *matHeaderRowDef="displayedColumnsColaboradores; sticky: true"></tr>
+                                <tr mat-row *matRowDef="let row; let i = index; columns: displayedColumnsColaboradores;" [cdkContextMenuTriggerFor]="rowMenu" [cdkContextMenuTriggerData]="{data:row, index:i}"></tr>
+                                <tr mat-footer-row *matFooterRowDef="['noResultsFound']" [ngClass]="{'hide':!(dataColaboradores!=[] && dataColaboradores.length==0)}"></tr>
+                            </table>
+                        </div>
+                        <div>
+                            <mat-paginator #paginator [length]="resultsLength" [pageIndex]="0" [pageSizeOptions]="[3, 6, 9]" [pageSize]="pageSize" showFirstLastButtons aria-label="Selecciona una página"></mat-paginator>
+                        </div>
+                    </div>
+                </mat-card>
+            </div>
+
+
+            <ng-template #rowMenu let-data="data" let-index="index">
+                <div class="context-menu mat-elevation-z2" cdkMenu>
+                    <button class="context-menu-item" (click)="editRowColaborador(data)" cdkMenuItem><mat-icon>edit</mat-icon>&nbsp;Editar</button>
+                    <!-- <button class="context-menu-item" color="warn" (click)="quitarColaborador(index)" cdkMenuItem><mat-icon>delete</mat-icon>&nbsp;Eliminar</button> -->
+                </div>
+            </ng-template>
+
+        </section>
+        
+    </section>
+
+</section>

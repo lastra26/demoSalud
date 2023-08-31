@@ -1,0 +1,114 @@
+@media(max-width: 599.98px){
+    .xs-height-50{
+        height: 50%;
+    }
+
+    .xs-max-height-user-form{
+        max-height: 20%;
+        overflow: auto;
+    }
+}
+
+.root-access{
+    padding-right: 5px;
+    padding-left: 5px;
+    font-weight: 600;
+    color: gold !important;
+    display: flex;
+    align-items: center;
+    cursor: default;
+}
+
+.user-tabs{
+    background-color: lavender;
+}
+
+.config-pass{
+    padding: 8px;
+    border: 1px solid lightgray;
+    background-color: rgba(135, 206, 250,0.5);
+    display: flex;
+    align-items: center;
+}
+
+.config-pass .mensaje{
+    width: 100%;
+    font-weight: 400;
+    font-size: large;
+    color: rgb(81, 80, 80);
+    padding: 8px;
+    text-align: center;
+    cursor: default;
+}
+
+.item-tile-wrapper{
+    padding: 8px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+
+.avatar-icon{
+    padding: 5px;
+    border: 1px solid rgba(0,0,0,0);
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.avatar-icon:hover{
+    border: 1px solid rgba(0,0,0,0.25);
+    background-color: whitesmoke;
+}
+
+.avatar-icon.selected{
+    border: 1px solid rgba(0,0,0,0.40);
+    background-color: hsl(231, 50%, 50%);
+}
+
+.avatar-row-count{
+    padding: 8px;
+    text-align: center;
+    border: 1px solid rgba(0,0,0,0.40);
+    border-radius: 15%;
+    margin: 5px;
+    width: 35px;
+    cursor: default;
+}
+
+.last-login{
+    padding-right: 5px;
+    padding-top: 4px;
+}
+
+.last-login span{
+    display: block;
+    font-size: small;
+}
+
+.last-login .label{
+    color: lightgrey;
+}
+
+.status-label.status-inactive{
+    color: hsl(0, 0%, 74%) !important;
+    background-color: hsl(0, 0%, 31%) !important;
+}
+
+.status-label.status-active{
+    --color: 120;
+}
+
+.status-label.status-blocked{
+    --color: 52;
+}
+
+.status-label.status-banned{
+    --color: 6;
+}
+
+.status-label{
+    color: hsl(var(--color), 100%, 75%);
+    background-color: hsl(var(--color), 100%, 25%);
+}

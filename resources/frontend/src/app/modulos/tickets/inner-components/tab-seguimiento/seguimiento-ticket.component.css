@@ -1,0 +1,10 @@
+@media(max-width: 599.98px){
+    .xs-height-50{
+        height: 50%;
+    }
+
+    .xs-max-height-seguimiento-form{
+        max-height: 50%;
+        overflow: auto;
+    }
+}

@@ -1,0 +1,80 @@
+<section style="height: 100%;" class="flex-column flex-gap">
+    <div class="flex-row dialog-header">
+        <div mat-dialog-title>
+            <span *ngIf="rol.id">Editar</span> <span *ngIf="!rol.id">Nuevo</span> Rol
+        </div>
+        <div class="user-count" *ngIf="rol.users">
+            <button mat-stroked-button cdkOverlayOrigin #btnVerListaUsuario="cdkOverlayOrigin" (click)="listaUsuariosIsVisible = !listaUsuariosIsVisible">
+                <mat-icon>account_circle</mat-icon> <span><span class="hide-xs">Usuarios :</span> {{rol.users.length}}</span>
+            </button>
+            <ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="btnVerListaUsuario" [cdkConnectedOverlayOpen]="listaUsuariosIsVisible" yPosition="below" xPosition="before" (overlayKeydown)="listaUsuariosIsVisible = false" (overlayOutsideClick)="listaUsuariosIsVisible = false">
+                <mat-card class="list-users-role">
+                    <mat-list dense>
+                        <mat-list-item class="user" *ngFor="let user of rol.users">
+                          <div class="username" mat-line>{{user.username}}</div>
+                          <mat-divider></mat-divider>
+                        </mat-list-item>
+                        <mat-list-item class="user" *ngIf="rol.users.length == 0">
+                            <div class="no-users" mat-line>No hay Usuarios asignados</div>
+                        </mat-list-item>
+                    </mat-list>
+                </mat-card>
+            </ng-template>
+        </div>
+        <div class="flex-fill"></div>
+        <div class="icon-button-container">
+            <button mat-icon-button (click)='onNoClick()'><mat-icon>clear</mat-icon></button>
+        </div>
+    </div>
+    <alert-panel></alert-panel>
+    <div class="flex-fill">
+        <mat-progress-bar *ngIf="isLoading" [mode]="'query'"></mat-progress-bar>
+        <div class="form-container flex-column">
+            <div class="flex-column flex-gap" fxLayout.lt-sm="column" [formGroup]="rolForm">
+                <mat-form-field class="flex-fill">
+                    <mat-label>Nombre</mat-label>
+                    <input matInput id="name" formControlName="name" required cdkFocusInitial>
+                    <mat-error *ngIf="rolForm.get('name').hasError('required')">Este campo es obligatorio</mat-error>
+                </mat-form-field>
+            </div>
+            <div class="flex-fill flex-column flex-gap">
+                <div>
+                    <mat-form-field appearance="outline" class="small-search-input">
+                        <input matInput type="text" placeholder="Agregar Permisos" autocomplete="off" [formControl]="permissionControl" [matAutocomplete]="autoPermissions">
+                        <mat-icon matPrefix>keyboard</mat-icon>
+                        <span matSuffix>&nbsp;({{(filteredPermissions | async)?.length|number}})&nbsp;</span>
+                        <mat-autocomplete autoActiveFirstOption #autoPermissions="matAutocomplete" [displayWith]="displayFn" (optionSelected)="addPermission($event)">
+                          <mat-option *ngFor="let permission of filteredPermissions | async" [value]="permission"  class="permission-item" [disabled]="controlSelPermissions[permission.id]">
+                            <div class="label">
+                                <span class="permission-group">{{permission.group}}</span>
+                                <mat-icon *ngIf="controlSelPermissions[permission.id]">playlist_add_check</mat-icon>&nbsp;{{permission.description}}&nbsp;<span *ngIf="permission.is_super" class="root-access">--root--</span>
+                            </div>
+                          </mat-option>
+                        </mat-autocomplete>
+                    </mat-form-field>
+                </div>
+                <div class="flex-fill permissions-panel">
+                    <mat-list role="list" dense>
+                        <mat-list-item role="listitem" *ngFor="let permission of selectedPermissions; let i = index" class="permission-item">
+                            <div class="flex-row">
+                                <div class="label flex-fill">
+                                    <span class="permission-group">{{permission.group}}</span>
+                                    {{permission.description}}&nbsp;<span *ngIf="permission.is_super" class="root-access">--root--</span>
+                                </div>
+                                <span class="action-button">
+                                    <button mat-icon-button color="warn" (click)="removePermission(i)"><mat-icon>do_not_disturb_on</mat-icon></button>
+                                </span>
+                            </div>
+                        </mat-list-item>
+                    </mat-list>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div mat-dialog-actions>
+        <button *ngIf="rol.id" mat-raised-button (click)="confirmDeleteRole()" color="warn"><mat-icon>delete</mat-icon> Eliminar</button>
+        <span class="flex-fill"></span>
+        <button mat-button class="hide-xs" (click)='onNoClick()'>Cancelar</button>
+        <button mat-raised-button (click)="saveRole()" color="primary" [disabled]="rolForm.invalid || isLoading"><mat-icon>save</mat-icon> Guardar</button>
+    </div>
+</section>

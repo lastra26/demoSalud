@@ -1,0 +1,14 @@
+@media(max-width: 599.98px){
+    .xs-height-50{
+        height: 70%;
+    }
+
+    .xs-max-height-equipo-form{
+        max-height: 70%;
+        overflow: auto;
+    }
+}
+
+.equipos-tabs{
+    background-color: rgb(246, 246, 246);
+}

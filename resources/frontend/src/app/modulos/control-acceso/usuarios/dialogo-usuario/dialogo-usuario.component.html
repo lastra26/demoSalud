@@ -1,0 +1,190 @@
+<section class="flex-column" style="height: 100%; overflow: hidden; flex: 1 1 0%;" (document:keydown.escape)="cancelarAccion()"> <!-- Main Body <<<<<<< -->
+    <section class="dialog-toolbar"> <!-- Toolbar Menu <<<<<<< -->
+        <div class="flex-row">
+            <div class="label-info status-label status-{{statusDesc[statusUser].key}}" *ngIf="statusUser">
+                <mat-icon>{{statusDesc[statusUser].icon}}</mat-icon><span class="hide-xs">&nbsp;Usuario: {{statusDesc[statusUser].description}}</span>
+            </div>
+            <div class="label-info" *ngIf="!statusUser">
+                Nuevo Usuario
+            </div>
+            <button mat-button [matMenuTriggerFor]="menuUsuario" aria-label="Menu de Usuarios" [disabled]="isLoading || isSaving"  *ngIf="statusUser">
+                <mat-icon>settings</mat-icon><span class="hide-xs">Opciones&nbsp;</span><mat-icon>arrow_drop_down</mat-icon>
+            </button>
+            <mat-menu #menuUsuario="matMenu">
+                <button mat-menu-item (click)="enviarCorreo()" *ngIf="inData.id" [disabled]="isSendingEmail || configPass">
+                    <mat-icon>outgoing_mail</mat-icon> 
+                    <span>Cambio de Contraseña</span>
+                </button>
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="cambiarStatus(2)" *ngIf="statusUser == 3 || statusUser == 4">
+                    <mat-icon>{{statusDesc[2].icon}}</mat-icon> 
+                    <span>Activar Usuario</span>
+                </button>
+                <button mat-menu-item (click)="cambiarStatus(4)" *ngIf="statusUser != 4">
+                    <mat-icon>{{statusDesc[4].icon}}</mat-icon>
+                    <span>Banear Usuario</span>
+                </button>
+            </mat-menu>
+            <button mat-button (click)="guardarUsuario()" [disabled]="isLoading || isSaving || !formUsuario.valid || isSendingEmail">
+                <mat-icon>{{(changesDetected)?'save_as':'save'}}</mat-icon><span class="hide-xs">&nbsp;Guardar</span>
+            </button>
+            <div class="flex-fill"></div>
+            <div *ngIf="isRoot" class="root-access">
+                &LeftAngleBracket;&LeftAngleBracket; root &RightAngleBracket;&RightAngleBracket;
+            </div>
+            <div class="label-info screen-size-icon" *ngIf="currentScreenSize == 'xs' || currentScreenSize == 'sm'">
+                <mat-icon>phone_iphone</mat-icon>
+            </div>
+            <div *ngIf="statusUser" class="last-login hide-xs">
+                <span class="label">Último Inicio de Sesión:</span>
+                <span class="value">{{(lastLogin)?(lastLogin | date:'dd - MMM - y | h:mm a'):'Nunca'}}</span>
+            </div>
+            <button mat-button class="boton-accion" (click)="resizeDialog()" [matTooltip]="(dialogMaxSize)?'Restaurar':'Maximizar'" [matTooltipPosition]="'left'" tabindex="-1" *ngIf="currentScreenSize != 'xs' && currentScreenSize != 'sm'">
+                <mat-icon>{{(dialogMaxSize)?'fit_screen':'fullscreen'}}</mat-icon>
+            </button>
+            <button class="boton-accion boton-cerrar" mat-button (click)="cerrar()" tabindex="-1"><mat-icon>close</mat-icon></button>
+        </div>
+    </section> <!-- <<<<<<< Toolbar Menu -->
+    <mat-progress-bar *ngIf="isLoading || isSaving || isSendingEmail" [mode]="(isSaving || isSendingEmail)?'indeterminate':'query'" [color]="(isSaving || isSendingEmail)?'accent':'primary'"></mat-progress-bar>
+    <section>
+        <alert-panel></alert-panel>
+    </section>
+    <section class="flex-fill flex-column" style="padding:8px; overflow: auto;">
+        <div class="flex-fill flex-column flex-gap">
+            <mat-card class="flex-column flex-gap xs-max-height-user-form" style="padding: 8px;" [formGroup]="formUsuario">
+                
+                <div class="flex-row flex-xs-column flex-fill flex-gap">
+
+                    <mat-form-field appearance="fill" class="flex-fill" *ngIf="!catalogos['colaboradores']">
+                        <mat-label>Colaborador: </mat-label>
+                        <input matInput formControlName="colaborador_id">
+                        <mat-hint>Escribe el nombre del Colaborador</mat-hint>
+                        <mat-error *ngIf="formUsuario.get('colaborador_id').hasError('required')">Este campo es obligatorio</mat-error>
+                    </mat-form-field>
+    
+                    <mat-form-field appearance="fill" class="flex-fill" *ngIf="catalogos['colaboradores']">
+                        <mat-label>Colaborador: </mat-label>
+                        <input type="text" aria-label="colaborador_id" matInput formControlName="colaborador_id" [matAutocomplete]="crAutocomplete" required (blur)="checkAutocompleteValue('colaborador_id')">
+                        <mat-autocomplete #crAutocomplete="matAutocomplete" [displayWith]="getDisplayFn('nombre_completo')" (optionSelected)="putUsername($event)">
+                            <mat-option *ngFor="let colaborador of filteredCatalogs['colaboradores'] | async" [value]="colaborador" [disabled]="colaborador?.isAssigned === true">
+                                {{ colaborador.nombre_completo }} - {{colaborador.hora_entrada}} / {{colaborador.hora_salida}}
+                            </mat-option>
+                        </mat-autocomplete>
+                        <mat-hint *ngIf="!formUsuario.get('colaborador_id').value">Selecciona un Colaboradore la lista</mat-hint>
+                        <mat-hint [style.text-align]="'start'" *ngIf="formUsuario.get('colaborador_id').value">Horario: [ {{formUsuario.get('colaborador_id').value.hora_entrada}} - {{formUsuario.get('colaborador_id').value.hora_salida}}]</mat-hint>
+                        <mat-error *ngIf="formUsuario.get('colaborador_id').hasError('required')">Este campo es obligatorio</mat-error>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="fill" class="flex-fill">
+                        <mat-label>Nombre Completo: </mat-label>
+                        <input type="text" matInput autocomplete="off" formControlName="name" placeholder="Nombre Completo" required cdkFocusInitial>
+                        <mat-error *ngIf="formUsuario.get('name').hasError('required')">Este campo es obligatorio</mat-error>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="fill" class="flex-fill">
+                        <mat-label>Correo Electrónico: </mat-label>
+                        <input type="text" matInput autocomplete="off" id="email" formControlName="email" placeholder="Correo Electrónico" required>
+                        <mat-error *ngIf="formUsuario.get('email').hasError('required')">El Correo Electrónico es obligatorio</mat-error>
+                        <mat-error *ngIf="formUsuario.get('email').hasError('email')">Formato incorrecto</mat-error>
+                        <mat-error *ngIf="formUsuario.get('email').hasError('duplicated')">El Correo Electrónico esta repetido</mat-error>
+                    </mat-form-field>
+
+                </div>
+
+                <div class="flex-row flex-xs-column flex-fill flex-gap">
+                    <mat-form-field appearance="fill">
+                        <mat-label>Usuario: </mat-label>
+                        <input type="text" matInput autocomplete="off" id="username" formControlName="username" placeholder="Nombre de Usuario" required>
+                        <button mat-icon-button matSuffix (click)="toggleConfigPass()" [matTooltip]="(configPass)?'':'Escribir Contraseña'" [attr.aria-label]="'Config Pass'" [attr.aria-pressed]="configPass" tabindex="-1">
+                            <mat-icon>{{configPass ? 'lock_reset' : 'keyboard'}}</mat-icon>
+                        </button>
+                        <mat-hint align="end">{{formUsuario.get('username').value?.length || 0}}</mat-hint>
+                        <mat-error *ngIf="formUsuario.get('username').hasError('required')">El Nombre de Usuario es obligatorio</mat-error>
+                        <mat-error *ngIf="formUsuario.get('username').hasError('minlength')">Debe contener al menos 4 caracteres</mat-error>
+                        <mat-error *ngIf="formUsuario.get('username').hasError('duplicated')">El Nombre de Usuario esta repetido</mat-error>
+                    </mat-form-field>
+                    <div class="config-pass flex-fill" *ngIf="!inData.id && !configPass">
+                        <div class="mensaje">Se enviará un correo de activación</div>
+                    </div>
+                    <div class="flex-row  flex-xs-column flex-fill flex-gap" *ngIf="configPass">
+                        <mat-form-field class="flex-fill" appearance="fill">
+                            <mat-label><mat-icon *ngIf="formUsuario.get('valid_password').value">check_circle</mat-icon> Contraseña:</mat-label>
+                            <input matInput #inputPassword formControlName="password" placeholder="Contraseña" [type]="hidePassword ? 'password' : 'text'" required [matAutocomplete]="autoPass">
+                            <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword" tabindex="-1">
+                                <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                            </button>
+                            <mat-autocomplete #autoPass="matAutocomplete" [panelWidth]="'auto'">
+                                <mat-option [value]="true" disabled style="opacity: 1 !important;">
+                                    <strength-checker barLabel="Fortaleza: " [passwordToVerify]="formUsuario.get('password').value" (passwordStrength)="passwordValid($event)"></strength-checker>
+                                </mat-option>
+                            </mat-autocomplete>
+                            <mat-hint align="end">{{formUsuario.get('password').value.length || 0}}</mat-hint>
+                            <mat-error *ngIf="formUsuario.get('password').hasError('minlength')">Debe contener al menos 8 caracteres</mat-error>
+                            <mat-error *ngIf="formUsuario.get('password').hasError('required')">La Contraseña es obligatoria</mat-error>
+                            <mat-error *ngIf="formUsuario.get('password').hasError('lowstrenght')">La Contraseña no es segura</mat-error>
+                            <mat-error *ngIf="formUsuario.get('password').hasError('samepassword')">La Contraseña debe ser diferente</mat-error>
+                        </mat-form-field>
+    
+                        <mat-form-field class="flex-fill" appearance="fill">
+                            <mat-label>Confirmar Contraseña:</mat-label>
+                            <input matInput formControlName="confirm_password" placeholder="ConfirmarContraseña" [type]="hideConfirmPassword ? 'password' : 'text'" required>
+                            <button mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hideConfirmPassword" tabindex="-1">
+                                <mat-icon>{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                            </button>
+                            <mat-hint align="end">{{formUsuario.get('confirm_password').value.length || 0}}</mat-hint>
+                            <mat-error *ngIf="formUsuario.get('confirm_password').hasError('required')">Confirmar Contraseña</mat-error>
+                            <mat-error *ngIf="formUsuario.get('confirm_password').hasError('fieldMatch')">Las contraseñas no coinciden</mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </mat-card>
+            
+            <mat-tab-group [color]="'primary'" animationDuration="0ms" class="flex-fill full-height-tabs user-tabs">
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <mat-icon>security</mat-icon><span class="hide-xs">&nbsp;Acceso / Seguridad</span>
+                    </ng-template>
+                    <div class="flex-row flex-xs-column" style="overflow: hidden; height: 100%;">
+                        <div class="flex-fill xs-height-50" style="padding: 5px;">
+                            <tab-roles (roleSelected)="addFromRole($event)" (roleRemoved)="removeFromRole($event)" (changeDetected)="changesDetected = true" style="height: 100%;"></tab-roles>
+                        </div>
+                        <div class="flex-fill xs-height-50" style="padding: 5px;">
+                            <tab-permissions style="height: auto;" (changeDetected)="changesDetected = true"></tab-permissions>
+                        </div>
+                    </div>
+                </mat-tab>
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <mat-icon>face</mat-icon><span class="hide-xs">&nbsp;Avatar</span>
+                    </ng-template>
+                    <div class="flex-row flex-gap" style="overflow-x: hidden; height: calc(100% - 10px); padding: 5px;">
+                        <div class="flex-column flex-fill" style="padding: 3px;">
+                            <div class="flex-row">
+                                <div style="display: flex; align-items: center;">
+                                    <span class="avatar-row-count">{{avatarRowCount}}</span>
+                                </div>
+                                <mat-slider class="flex-fill" [max]="10" [min]="3" [step]="1" [showTickMarks]="true">
+                                    <input matSliderThumb [(ngModel)]="avatarRowCount">
+                                </mat-slider>
+                                <div class="flex-fill"></div>
+                            </div>
+                            <mat-card class="flex-fill" style="overflow: auto;" *ngIf="avatarsList">
+                                <mat-grid-list cols="{{avatarRowCount}}" rowHeight="1:1" style="overflow: auto;">
+                                    <mat-grid-tile *ngFor="let avatar of avatarsList">
+                                        <div class="flex-row" class="item-tile-wrapper">
+                                            <div class="flex-column flex-fill flex-gap avatar-icon" [ngClass]="{'selected':selectedAvatar == avatar.file}">
+                                                <div class="flex-fill" (click)="selectAvatar(avatar.file)">
+                                                    <mat-icon style="width: 100%; height: 100%;" svgIcon="{{avatar.id}}"></mat-icon>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </mat-grid-tile>
+                                </mat-grid-list>
+                            </mat-card>
+                        </div>
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+        </div>
+    </section>
+</section>

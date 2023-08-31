@@ -1,0 +1,44 @@
+.lista-resultados .item-resultado{
+    width: -webkit-fill-available;
+    padding: 5px;
+    cursor: default;
+}
+
+.lista-resultados .item-resultado .encabezado div{
+    width: 50%;
+    display: inline-block;
+    font-size: x-small;
+    font-weight: 500;
+}
+
+.lista-resultados .item-resultado:nth-child(odd){
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.lista-resultados .item-resultado .encabezado .clues{
+    text-align: left;
+}
+
+.lista-resultados .item-resultado .encabezado .distrito{
+    text-align: right;
+}
+
+.lista-resultados .item-resultado .nombre-unidad{
+    padding: 5px 0;
+}
+
+.lista-resultados .item-resultado:hover{
+    cursor: pointer;
+    background-color: lightblue;
+}
+
+.lista-resultados .item-resultado:not(:last-child){
+    border-bottom: 1px solid darkgrey;
+}
+
+.total-resultados{
+    text-align: right;
+    color: darkgrey;
+    font-size: small;
+    border-top: 1px solid darkgrey;
+}

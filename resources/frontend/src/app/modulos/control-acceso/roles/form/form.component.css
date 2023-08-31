@@ -1,0 +1,109 @@
+.form-container {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding:10px;
+}
+
+.icon-button-container{
+    padding: 5px;
+}
+
+.dialog-header{
+    border-bottom: 1px solid rgba(0,0,0,0.25);
+}
+
+.user-count{
+    display: flex;
+    align-items: center;
+}
+
+.permissions-panel{
+    overflow: auto;
+    border:1px solid lightgray;
+    border-radius: 1%;
+    padding: 8px;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    height: 0px;
+}
+
+.permissions-panel .mdc-list-item{
+    height: auto !important;
+    min-height: 48px;
+    padding-right: 0px;
+}
+
+.permissions-panel .mdc-list-item:hover{
+    background: rgba(0,0,0,.04);
+}
+
+.permission-group{
+    display: block;
+    font-size: small;
+    color: slategray;
+}
+
+.permission-item:not(:first-child){
+    border-top: 1px solid darkgray;
+}
+
+.permission-item .action-button{
+    padding: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.permission-item .label{
+    display: inline-block;
+    white-space: normal !important;
+    width: fit-content;
+}
+
+.permission-item .label .mat-icon{
+    margin: 0;
+    line-height: normal;
+    height: 20px;
+    width: 20px;
+    font-size: 24px;
+}
+
+.root-access{
+    font-size: smaller;
+    text-align: center;
+    font-weight: 600;
+    color: darkcyan !important;
+}
+
+.list-users-role{
+    overflow: auto;
+    max-height: 500px;
+}
+
+.list-users-role .user:not(:last-child){
+    border-bottom: 1px solid darkgray;
+}
+
+.list-users-role .user:hover{
+    background: rgba(0,0,0,.04);
+}
+
+.list-users-role .no-users{
+    font-style: italic;
+    color: darkgrey;
+}
+
+.list-users-role .user .username{
+    font-size: small !important;
+    line-height: normal;
+    font-weight: 500;
+}
+
+
+.list-users-role .user .name{
+    font-size: x-small !important;
+    line-height: normal;
+    font-weight: 400;
+    color: darkslategrey;
+}

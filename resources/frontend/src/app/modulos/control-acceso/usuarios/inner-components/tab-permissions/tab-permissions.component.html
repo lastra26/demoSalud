@@ -1,0 +1,36 @@
+<mat-card class="flex-column flex-gap" style="height: 100%;">
+    <div style="padding: 5px;">
+        <mat-form-field appearance="outline" class="small-search-input">
+            <input matInput type="text" placeholder="Permisos" autocomplete="off" [formControl]="permissionControl" [matAutocomplete]="autoPermissions">
+            <mat-icon matPrefix>keyboard</mat-icon>
+            <span matSuffix>&nbsp;({{(filteredPermissions | async)?.length|number}})&nbsp;</span>
+            <mat-autocomplete autoActiveFirstOption #autoPermissions="matAutocomplete" [displayWith]="displayFn" (optionSelected)="addPermissionEvent($event)">
+                <mat-option *ngIf="catalogPermissions.length == 0" disabled class="no-results-found">
+                    No se encontraron Permisos
+                </mat-option>
+                <mat-option *ngFor="let permission of filteredPermissions | async" [value]="permission"  class="permission-item" [disabled]="ctrlSelPermissions[permission.id]">
+                    <div class="label">
+                        <span class="permission-group">{{permission.group}}</span>
+                        <mat-icon *ngIf="ctrlSelPermissions[permission.id]">playlist_add_check</mat-icon>&nbsp;{{permission.description}}&nbsp;<mat-icon *ngIf="permission.is_super" class="root-access">star</mat-icon>
+                    </div>
+                </mat-option>
+            </mat-autocomplete>
+        </mat-form-field>
+    </div>
+    <div class="flex-fill permissions-panel mat-elevation-z2">
+        <mat-list role="list" dense>
+            <mat-list-item role="listitem" *ngFor="let permission of selectedPermissions; let i = index" class="permission-item">
+                <div class="flex-row">
+                    <div class="label flex-fill">
+                        <span class="permission-group">{{permission.group}}</span>
+                        {{permission.description}}&nbsp;<mat-icon *ngIf="permission.is_super" class="root-access">star</mat-icon>
+                    </div>
+                    <span class="action-button">
+                        <button mat-icon-button color="warn" *ngIf="ctrlSelPermissions[permission.id].roles.length == 0" (click)="removePermission(i)"><mat-icon>do_not_disturb_on</mat-icon></button>
+                        <mat-slide-toggle color="primary" *ngIf="ctrlSelPermissions[permission.id].roles.length > 0" (change)="toggleActivePermission(permission.id,$event)" [checked]="ctrlSelPermissions[permission.id].active"></mat-slide-toggle>
+                    </span>
+                </div>
+            </mat-list-item>
+        </mat-list>
+    </div>
+</mat-card>
